@@ -1,0 +1,783 @@
+/* eslint-disable react-native/no-inline-styles */
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, BackHandler, DeviceEventEmitter, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon } from '@rneui/themed';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
+import EditorCard from '../Components/editor-card.js';
+import SearchCardName from '../Components/search-card-name.js';
+import Header from '../Components/header.js';
+
+const deviceWidth = Dimensions.get('window').width;
+
+const DeckListEditorScreen = ({navigation, route}) => {
+    const bg = require('../../assets/bg.png');
+
+    const MAX_SIZES = [60, 15, 15];
+
+    const [isInfoLoading, setIsInfoLoading] = useState(true);
+    const [enterName, setEnterName] = useState(false);
+    const [deckIndexToEdit, setDeckIndexToEdit] = useState(-1);
+    const [changed, setChanged] = useState(0);
+    const [wait, setWait]  = useState(false);
+    const [savedConfirmation, setSavedConfirmation] = useState(false);
+    const [removeCardConfirmation, setRemoveCardConfirmation] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const language = useRef(null);
+    const sizes = useRef(null);
+    const cardToRemove = useRef(null);
+    const deckList = useRef(null);
+    const deckListClone = useRef(null);
+    const nameToEdit = useRef(null);
+
+    useEffect(() => {
+        const backAction = () => {
+            if (enterName) {
+                setEnterName(false);
+                return true;
+            } else if (changed > 0) {
+                setShowConfirm(true);
+                return true;
+            }
+        };
+
+          const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+          );
+          return () => backHandler.remove();
+    }, [changed, enterName]);
+
+    useEffect(() => {
+        const loadLanguage = async () => {
+            const value = await AsyncStorage.getItem('settings');
+            language.current = (value !== null ? JSON.parse(value).language : 'en');
+        };
+
+        loadLanguage();
+        setTimeout(() => {
+            setIsInfoLoading(false);
+        }, 1000);
+    }, []);
+
+    useEffect(() => {
+        nameToEdit.current = route.params.name;
+        sizes.current = [0 ,0 ,0];
+
+        if (route.params.deckList && !deckListClone.current) {
+            deckList.current = route.params.deckList;
+            deckListClone.current = JSON.parse(JSON.stringify(deckList.current));
+        }
+    }, [route.params.deckList, route.params.name]);
+
+    const showCardRemovalMessage = (name, deckIndex, cardIndex) => {
+        cardToRemove.current = {name: name, deckIndex: deckIndex, cardIndex: cardIndex};
+        setRemoveCardConfirmation(true);
+    };
+
+    const removeCard = () => {
+        setWait(true);
+        const modifiedDeck = deckListClone.current[cardToRemove.current.deckIndex];
+        modifiedDeck.splice(cardToRemove.current.cardIndex, 1);
+        deckListClone.current[cardToRemove.current.deckIndex] = modifiedDeck;
+        setTimeout(() => {
+            setWait(false);
+            setChanged(changed + 1);
+        }, 1000);
+    };
+
+    const getElements = () => {
+        let elements = [];
+
+        if (deckListClone.current) {
+            for (let i = 0; i < deckListClone.current.length; i++) {
+                const deck = deckListClone.current[i];
+                elements.push(
+                    <View key={i} style={styles.deckContainer}>
+                        <Text key={'d' + i} style={[styles.deckType, {marginBottom: deck.length > 0 ? '5%' : 0}]}>
+                            {i === 0 ? 'Main Deck' : i === 1 ? 'Extra Deck' : 'Side Deck'}
+                        </Text>
+                        {getDeck(i, deck)}
+                    </View>
+                );
+                elements.push(
+                    <View key={'d.' + i} style={styles.addButtonContainer}>
+                        <TouchableHighlight disabled={!(sizes.current[i] < MAX_SIZES[i])} underlayColor={'#e0bb3f'}
+                        style={[styles.addButton, {opacity: sizes.current[i] < MAX_SIZES[i] ? 1 : 0.5}]} onPress={() => {
+                            setDeckIndexToEdit(i);
+                            setEnterName(true);
+                        }}>
+                            <Text style={styles.addText}>ADD CARDS TO {i === 0 ? 'MAIN' : i === 1 ? 'EXTRA' : 'SIDE'} DECK</Text>
+                        </TouchableHighlight>
+                    </View>
+                );
+            }
+        } else {
+            for (let i = 0; i < 3; i++) {
+                elements.push(
+                    <View key={'empty' + i}>
+                        <View style={styles.deckContainer}>
+                            <Text key={'d' + i} style={styles.deckType}>
+                                {i === 0 ? 'Main' : i === 1 ? 'Extra' : 'Side'} Deck
+                            </Text>
+                        </View>
+                        <View style={styles.emptyMsg}>
+                            <Image source={require('../../assets/no-card-found.png')} style={{height: deviceWidth * 0.9 * 0.25, aspectRatio: 0.8362}}/>
+                            <Text style={styles.emptyText}>NO CARDS FOUND</Text>
+                        </View>
+                        <View key={'md'} style={styles.addButtonContainer}>
+                            <TouchableHighlight underlayColor={'#e0bb3f'} style={styles.addButton} onPress={() => {
+                                setDeckIndexToEdit(i);
+                                setEnterName(true);
+                            }}>
+                                <Text style={styles.addText}>ADD CARDS TO {i === 0 ? 'MAIN' : i === 1 ? 'EXTRA' : 'SIDE'} DECK</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                );
+            }
+        }
+        return elements;
+    };
+
+    const getDeck = (index, actualDeck) => {
+        const deck = [];
+        if (actualDeck.length > 0) {
+            let cardList = [];
+            let count = 0;
+
+            for (let j = 0; j < actualDeck.length; j++) {
+                const c = actualDeck[j];
+                count += c.quantity;
+                cardList.push(
+                    <EditorCard key={'d' + index + 'c' + j} img={c.card.card_images[0].image_url}
+                    name={c.card.name[0][language.current] ? c.card.name[0][language.current] : c.card.name[0].en} quantity={c.quantity}
+                    deckIndex={index} cardIndex={j} showCardRemovalMessage={showCardRemovalMessage} updateDeckSize={updateDeckSize}
+                    canAddCopies={sizes.current[index] < MAX_SIZES[index]} />
+                );
+            }
+
+            sizes.current[index] = count;
+
+            deck.push(
+                <View key={index} style={{gap: 12}}>
+                    {cardList}
+                </View>
+            );
+        } else {
+            return (
+                <View style={styles.emptyMsg}>
+                    <Image source={require('../../assets/no-card-found.png')} style={{height: deviceWidth * 0.9 * 0.25, aspectRatio: 0.8362}}/>
+                    <Text style={styles.emptyText}>NO CARDS FOUND</Text>
+                </View>
+            );
+        }
+        return deck;
+    };
+
+    const addCard = (item) => {
+        if (!deckListClone.current) {
+            deckListClone.current = [[], [], []];
+        }
+
+        if (sizes.current[deckIndexToEdit] < MAX_SIZES[deckIndexToEdit]) {
+            const card = item;
+            const name = JSON.stringify(card.name);
+            const desc = JSON.stringify(card.desc);
+
+            card.name = [];
+            card.desc = [];
+
+            card.name.push(JSON.parse('{"' + language.current + '":' + name + '}'));
+            card.desc.push(JSON.parse('{"' + language.current + '":' + desc + '}'));
+
+            deckListClone.current[deckIndexToEdit].push({card: item, quantity: 1});
+            sizes.current[deckIndexToEdit] = sizes.current[deckIndexToEdit] + 1;
+
+            sortDeck(deckIndexToEdit);
+            setChanged(changed + 1);
+
+            return true;
+        }
+        return false;
+    };
+
+    const filterSearch = (card) => {
+        let supportedTypes = [];
+
+        if (deckIndexToEdit === 0) {
+            supportedTypes = ['normal', 'effect', 'ritual', 'spell', 'trap'];
+        } else if (deckIndexToEdit === 1) {
+            supportedTypes = ['fusion', 'synchro', 'xyz', 'link'];
+        } else if (deckIndexToEdit === 2) {
+            supportedTypes = ['normal', 'effect', 'ritual', 'spell', 'trap', 'fusion', 'synchro', 'xyz', 'link'];
+        }
+
+        let result = false;
+
+        for (let sp of supportedTypes) {
+            if (!result) {
+                result = card.frameType.toLowerCase().includes(sp);
+            }
+        }
+
+        if (deckListClone.current){
+            result &&= !isCardIncludedInDeck(deckListClone.current[deckIndexToEdit], card);
+        }
+
+        return result;
+    };
+
+    const isCardIncludedInDeck = (deck, card) => {
+        for (let c of deck) {
+            if (c.card.id.toString() === card.id.toString()){
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const updateDeckSize = (deckIndex, cardIndex, quantity) => {
+        (deckListClone.current[deckIndex][cardIndex]).quantity += quantity;
+        sizes.current[deckIndex] += quantity;
+        setChanged(changed + 1);
+    };
+
+    const saveChanges = async () => {
+        try {
+            setWait(true);
+            const value = await AsyncStorage.getItem('decks');
+
+            if (value) {
+                const name = nameToEdit.current;
+                let decks = JSON.parse(value);
+
+                const doDeckExists = deckExists(decks, name);
+
+                if (doDeckExists.exists) {
+                    const myDeckIndex = doDeckExists.index;
+
+                    const deckData = getDeckData();
+                    decks[myDeckIndex].content = deckData.content;
+                    decks[myDeckIndex].cards = deckData.cards;
+
+                    if (decks[myDeckIndex].img) {
+                        let hasCards = false;
+                        for (let deck of deckListClone.current) {
+                            if (!hasCards) {
+                                hasCards = deck.length > 0;
+                            }
+                        }
+                        if (!hasCards) {
+                            delete decks[myDeckIndex].img;
+                        }
+                    }
+
+                    await AsyncStorage.setItem('decks', JSON.stringify(decks));
+
+                    const url = decks[doDeckExists.index].url;
+                    if (url) {
+                        await editDeckPaste(url, deckData.content);
+                    }
+
+                    deckList.current = deckListClone.current;
+                    DeviceEventEmitter.emit('event.updateDeck', decks[doDeckExists.index]);
+                    DeviceEventEmitter.removeAllListeners('event.updateDeck');
+
+                    setWait(false);
+                    setSavedConfirmation(true);
+                    setTimeout(() => {
+                        setChanged(0);
+                        setSavedConfirmation(false);
+                    }, 1500);
+                } else {
+                    setWait(false);
+                }
+            }
+            else {
+                setWait(false);
+            }
+        } catch (e) {
+          console.log(e);
+          setWait(false);
+        }
+    };
+
+    const getToken = async () => {
+        const response = await fetch('https://rentry.co', {
+            headers: {
+                'Referer': 'https://rentry.co',
+            },
+        });
+
+        const cookie_data = response.headers.map['set-cookie'].split(';');
+        for (let i = 0; i < cookie_data.length; i++) {
+            cookie_data[i] = cookie_data[i].trim().split('=');
+            if (cookie_data[i][0] === 'csrftoken') {
+                return cookie_data[i][1];
+            }
+        }
+
+        return null;
+    };
+
+    const editDeckPaste = async (url, newText) => {
+        const csrftoken = await getToken();
+
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', csrftoken);
+        formData.append('edit_code', 'ygo_tools');
+        formData.append('text', newText);
+
+        await fetch(url + '/edit', {
+            method: 'POST',
+            headers: {
+                'Referer': 'https://rentry.co',
+                'Content-Type': 'multipart/form-data',
+                'X-CSRFToken': csrftoken,
+            },
+            body: formData,
+        });
+    };
+
+    const getDeckData = () => {
+        let cards = 0;
+
+        let main = '#main\n';
+        for (let card of deckListClone.current[0]) {
+            for (let i = 1; i <= card.quantity; i++){
+                main += (card.card.id + '\n');
+                cards++;
+            }
+        }
+
+        let extra = '#extra\n';
+        for (let card of deckListClone.current[1]) {
+            for (let i = 1; i <= card.quantity; i++){
+                extra += (card.card.id + '\n');
+            }
+        }
+
+        let side = '!side\n';
+        for (let card of deckListClone.current[2]) {
+            for (let i = 1; i <= card.quantity; i++){
+                side += (card.card.id + '\n');
+            }
+        }
+
+        return {content: main + extra + side, cards: cards};
+    };
+
+    const deckExists = (decks, name) => {
+        for (let i = 0; i < decks.length; i++) {
+            if (decks[i].name === name) {
+                return {exists: true, index: i};
+            }
+        }
+        return {exists: false, index: -1};
+    };
+
+    const sortDeck = (index) => {
+        if (deckListClone.current[index].length > 1) {
+            deckListClone.current[index] = deckListClone.current[index].sort(compareCards);
+        }
+    };
+
+    const compareCards = (a, b) => {
+        const monsterFrames = ['normal', 'effect', 'fusion',
+                                'ritual', 'synchro', 'xyz', 'link'];
+
+        const frameA = a.card.frameType.replace('_pendulum', '');
+        const frameB = b.card.frameType.replace('_pendulum', '');
+
+        const aIndex = monsterFrames.indexOf(frameA);
+        const bIndex = monsterFrames.indexOf(frameB);
+
+        if (aIndex >= 0) {  // a is monster
+            if (bIndex < 0) {   // b is not monster
+                return -1;
+            }
+            else {  // Both monsters
+                const comparedIndex = aIndex - bIndex;
+                if (comparedIndex !== 0) {
+                    return comparedIndex;
+                }
+                else {
+                    return compareMonsters(a, b);
+                }
+            }
+        } else {          // a is not monster
+            if (bIndex >= 0) {   // b is monster
+                return 1;
+            } else { // No monsters
+                if (a.card.frameType === b.card.frameType) {
+                    if (a.card.frameType === 'spell') {
+                        return compareSpells(a, b);
+                    } else {
+                        return compareTraps(a, b);
+                    }
+                } else {
+                    return a.card.frameType === 'spell' ? -1 : 1;
+                }
+            }
+        }
+    };
+
+    const compareMonsters = (a, b,) => {
+        const comparedLevel = b.card.level - a.card.level;
+
+        if (comparedLevel !== 0) {
+            return comparedLevel;
+        } else {
+            const aAtk = Number(a.card.atk);
+            const bAtk = Number(b.card.atk);
+
+            if (!isNaN(aAtk) && !isNaN(bAtk)) {   // a & b ATK is not ?
+                const comparedAtk = bAtk - aAtk;
+                if (comparedAtk !== 0) {
+                    return comparedAtk;
+                } else {
+                    const aDef = Number(a.card.def);
+                    const bDef = Number(b.card.def);
+
+                    if (!isNaN(aDef) && !isNaN(bDef)) {   // a & b ATK is not ?
+                        const comparedDef = bDef - aDef;
+                        if (comparedDef !== 0) {
+                            return comparedDef;
+                        } else {
+                            return a.card.id - b.card.id;
+                        }
+                    }
+                    else {
+                        if (isNaN(aDef) && isNaN(bDef)) {
+                            return a.card.id - b.card.id;
+                        } else {
+                            return (isNaN(bDef) ? -1 : 1);
+                        }
+                    }
+                }
+            }
+            else {
+                if (isNaN(aAtk) && isNaN(bAtk)) {
+                    return a.card.id - b.card.id;
+                } else {
+                    return (isNaN(bAtk) ? -1 : 1);
+                }
+            }
+        }
+    };
+
+    const compareSpells = (a, b) => {
+        const spellRaces = ['normal', 'ritual', 'quick-play', 'continuous', 'equip', 'field'];
+
+        const raceA = a.card.race.toLowerCase();
+        const raceB = b.card.race.toLowerCase();
+
+        const aIndex = spellRaces.indexOf(raceA);
+        const bIndex = spellRaces.indexOf(raceB);
+
+        const comparedIndex = aIndex - bIndex;
+
+        if (comparedIndex !== 0) {
+            return comparedIndex;
+        } else {
+            return a.card.id - b.card.id;
+        }
+    };
+
+    const compareTraps = (a, b) => {
+        const trapRaces = ['normal', 'continuous', 'counter'];
+
+        const raceA = a.card.race.toLowerCase();
+        const raceB = b.card.race.toLowerCase();
+
+        const aIndex = trapRaces.indexOf(raceA);
+        const bIndex = trapRaces.indexOf(raceB);
+
+        const comparedIndex = aIndex - bIndex;
+
+        if (comparedIndex !== 0) {
+            return comparedIndex;
+        } else {
+            return a.card.id - b.card.id;
+        }
+    };
+
+    const headerGoBackFunction = () => {
+        if (changed > 0) {
+            setShowConfirm(true);
+        } else {
+            navigation.goBack();
+        }
+    };
+
+    return (
+        <SafeAreaView>
+            <ImageBackground style={styles.image} source={bg} resizeMode={'cover'}>
+                {
+                isInfoLoading &&
+                <View style={styles.loading}>
+                    <ActivityIndicator size={120} color={'#ffffffb0'}/>
+                </View>
+                }
+                {
+                !isInfoLoading &&
+                <>
+                    {
+                    removeCardConfirmation &&
+                    <>
+                        <View style={styles.confirmContainer}>
+                            <View style={styles.confirmFrame}>
+                                <View style={styles.titleContainer}>
+                                    <Text style={styles.confirmTitle}>Warning</Text>
+                                    <Icon color="#ffffff" name="alert-circle-outline" size={22} type="material-community" style={{marginLeft: 4}}/>
+                                </View>
+                                <Text style={styles.confirmText}>Remove '{cardToRemove.current.name}' from {cardToRemove.current.deckIndex === 0
+                                ? 'main' : cardToRemove.current.deckIndex === 1 ? 'extra' : 'side'} deck?</Text>
+                                <View style={styles.buttonsContainer}>
+                                    <TouchableOpacity style={styles.confirmButton} onPress={() => {
+                                        setRemoveCardConfirmation(false);
+                                    }}>
+                                        <Text style={styles.buttonText}>No</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.confirmButton} onPress={() =>  {
+                                        setRemoveCardConfirmation(false);
+                                        removeCard();
+                                    }}>
+                                        <Text style={styles.buttonText}>Yes</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </>
+                    }
+                    {
+                    savedConfirmation &&
+                    <View style={styles.confirmContainer}>
+                        <View style={[styles.confirmFrame, {height: '25%', justifyContent: 'center', alignItems: 'center'}]}>
+                            <Icon color="#0f9" name="check-circle-outline" size={72} type="material-community"/>
+                            <Text style={styles.deckSavedText}>Deck saved!</Text>
+                        </View>
+                    </View>
+                    }
+                    {
+                    wait &&
+                    <View style={styles.wait}>
+                        <ActivityIndicator color={'#ffffff'} size={64}/>
+                        <Text style={styles.waitText}>Please wait...</Text>
+                    </View>
+                    }
+                    {
+                    !enterName &&
+                    <>
+                        <Header navigation={navigation} title={'Deck editor'} goBackFunction={() => headerGoBackFunction()}
+                        firstIcon={'content-save'} firstSize={deviceWidth * 0.08} firstFunction={() => saveChanges()} firstDisabled={changed <= 0}
+                        firstStyle={{opacity: changed > 0 ? 1 : 0.5, backgroundColor: changed > 0 ? '#0c6' : 'transparent'}}/>
+                        <ScrollView>
+                            {
+                                getElements()
+                            }
+                        </ScrollView>
+                    </>
+                    }
+                    {
+                    showConfirm &&
+                    <View style={styles.confirmContainer}>
+                        <View style={styles.confirmFrame}>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.confirmTitle}>Warning</Text>
+                            </View>
+                            <Text style={styles.confirmText}>Do you want to leave? All your unsaved changes will be discarded</Text>
+                            <View style={styles.buttonsContainer}>
+                                <TouchableOpacity style={styles.confirmButton} onPress={() => setShowConfirm(false)}>
+                                    <Text style={styles.buttonText}>No</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.confirmButton} onPress={() => {
+                                    setShowConfirm(false);
+                                    navigation.goBack();
+                                }}>
+                                    <Text style={styles.buttonText}>Yes</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                    }
+                    {
+                    enterName &&
+                    <SearchCardName cardSelectionFunction={addCard} showEnterNameFunction={setEnterName} cardElementIcon="card-plus"
+                    cardIconTransform={{transform: [{rotate: '-90deg'}]}} cardSearchFilter={filterSearch} lockLanguage={true}
+                    showToast={true}/>
+                    }
+                </>
+                }
+            </ImageBackground>
+        </SafeAreaView>
+    );
+};
+
+export default DeckListEditorScreen;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+    },
+    image: {
+        height: '100%',
+    },
+    header: {
+        width: '100%',
+        height: '8%',
+        backgroundColor: '#232436',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    headerButtonContainer: {
+        width: '37.5%',
+        height: '100%',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    backButton: {
+        width: '12.5%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerButton: {
+        width: '33.333%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerText: {
+        width: '50%',
+        fontFamily: 'Roboto',
+        fontSize: 26,
+        color: '#ffffff',
+        fontWeight: 700,
+    },
+    loading: {
+        height: '100%',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    confirmContainer: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        backgroundColor: '#000000c0',
+        zIndex: 600,
+    },
+    confirmFrame: {
+        width: '80%',
+        padding: '5%',
+        paddingBottom: 16,
+        backgroundColor: '#24242e',
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: '5%',
+    },
+    confirmTitle: {
+        fontSize: 22,
+        fontFamily: 'Roboto',
+        fontWeight: 700,
+        color: '#ffffff',
+        marginBottom: '5%',
+    },
+    confirmText: {
+        fontSize: 18,
+        fontFamily: 'Roboto',
+        fontWeight: 600,
+        color: '#ffffff',
+        marginBottom: '5%',
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'flex-end',
+        gap: Math.min(100, deviceWidth * 0.1),
+    },
+    confirmButton: {
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        fontSize: 18,
+        fontFamily: 'Roboto',
+        textAlign: 'center',
+        color: '#ffdd00',
+    },
+    deckSavedText: {
+        fontSize: 48,
+        color: '#fff',
+    },
+    wait: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        backgroundColor: '#000000c0',
+        zIndex: 500,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    waitText: {
+        fontFamily: 'Roboto',
+        fontSize: 32,
+        color: '#ffffff',
+        marginTop: '5%',
+    },
+    deckContainer: {
+        padding: '5%',
+    },
+    deckType: {
+        fontSize: 32,
+        fontWeight: 700,
+        color: '#fff',
+    },
+    emptyMsg: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        paddingTop: '10%',
+        opacity: 0.65,
+    },
+    emptyText: {
+        width: '100%',
+        color: '#ffffff',
+        fontFamily: 'Roboto',
+        fontSize: 24,
+        fontWeight: 700,
+        marginTop: '2%',
+        fontStyle: 'italic',
+        textAlign: 'center',
+    },
+    addButtonContainer: {
+        padding: '5%',
+    },
+    addButton: {
+        padding: '5%',
+        alignItems: 'center',
+        backgroundColor: '#f0df83',
+        borderRadius: 10,
+    },
+    addText: {
+        fontSize: 22,
+        fontWeight: 800,
+        color: '#232436',
+    },
+});

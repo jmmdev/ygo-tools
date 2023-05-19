@@ -1,0 +1,8 @@
+rootProject.name = 'YGOTranslate'
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+include ':app'
+includeBuild('../node_modules/react-native-gradle-plugin')
+include ':rn-text-detector'
+project(':rn-text-detector').projectDir = new File(rootProject.projectDir, 	'../node_modules/rn-text-detector/android')
+include ':react-native-android-image-cropper'
+project(':react-native-android-image-cropper').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-image-cropper/android')
