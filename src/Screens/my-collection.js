@@ -236,35 +236,43 @@ const MyCollectionScreen = ({navigation}) => {
                 </View>
                 }
                 {!isInfoLoading && pageCardList.current && pageCardList.current.length > 0 &&
-                    <ScrollView ref={mySetsList} style={styles.setsContainer} contentContainerStyle={styles.setsContent}>
-                        {
-                            pageCardList.current.map((set, index) => {
-                                return (
-                                    <TouchableOpacity key={set.set.set_code + '-' + index} style={styles.setContainer} activeOpacity={0.6}
-                                    onPress={() => navigation.navigate('SetCards', {set: set, setIndex: collection.current.indexOf(set)})}>
-                                        <>
-                                            <Image style={styles.setImage} source={set.set.set_image ? {uri: set.set.set_image} : require('../../assets/no-set-image.png')} />
-                                            <Text style={styles.setName}>{set.set.set_name}</Text>
-                                        </>
-                                    </TouchableOpacity>
-                                );
-                            })
+                <ScrollView ref={mySetsList} contentContainerStyle={styles.setsContent}>
+                    <View style={styles.setsContainer}>
+                    {
+                        pageCardList.current.map((set, index) => {
+                            return (
+                                <TouchableOpacity key={set.set.set_code + '-' + index} style={styles.setContainer} activeOpacity={0.6}
+                                onPress={() => navigation.navigate('SetCards', {set: set, setIndex: collection.current.indexOf(set)})}>
+                                    <>
+                                        <Image style={styles.setImage} source={set.set.set_image ? {uri: set.set.set_image} : require('../../assets/no-set-image.png')} />
+                                        <Text style={styles.setName}>{set.set.set_name}</Text>
+                                    </>
+                                </TouchableOpacity>
+                            );
+                        })
+                    }
+                    </View>
+                    <View style={styles.pagesContainer}>
+                        {(currentPage.current === 0 && numberOfPages.current === 2 || currentPage.current === 1 && numberOfPages.current > 2) &&
+                        <View style={{width: deviceWidth * 0.07}} />
                         }
-                        <View style={styles.pagesContainer}>
-                            {currentPage.current > 1 &&
-                            <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(0)}>
-                                <Icon color="#fff" name="page-first" size={deviceWidth * 0.07} type="material-community"/>
-                            </TouchableHighlight>
-                            }
-                            {showPages()}
-                            {
-                            currentPage.current < numberOfPages.current - 2 &&
-                            <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(numberOfPages.current - 1)}>
-                                <Icon color="#fff" name="page-last" size={deviceWidth * 0.07} type="material-community"/>
-                            </TouchableHighlight>
-                            }
-                        </View>
-                    </ScrollView>
+                        {currentPage.current > 1 &&
+                        <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(0)}>
+                            <Icon color="#fff" name="page-first" size={deviceWidth * 0.07} type="material-community"/>
+                        </TouchableHighlight>
+                        }
+                        {showPages()}
+                        {
+                        currentPage.current < numberOfPages.current - 2 &&
+                        <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(numberOfPages.current - 1)}>
+                            <Icon color="#fff" name="page-last" size={deviceWidth * 0.07} type="material-community"/>
+                        </TouchableHighlight>
+                        }
+                        {(currentPage.current === numberOfPages.current - 1 && numberOfPages.current === 2 || currentPage.current === numberOfPages.current - 2 && numberOfPages.current > 2) &&
+                        <View style={{width: deviceWidth * 0.07}} />
+                        }
+                    </View>
+                </ScrollView>
                 }
                 {!isInfoLoading && (!pageCardList.current || !pageCardList.current.length > 0) &&
                     <View style={styles.emptyMsg}>
@@ -349,10 +357,13 @@ const styles = StyleSheet.create({
         height: '92%',
         opacity: 0.65,
     },
-    setsContainer: {
+    setsContent: {
+        flexGrow: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         padding: '5%',
     },
-    setsContent: {
+    setsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 12,
@@ -377,8 +388,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        marginBottom: '15%',
         gap: Math.max(16, Dimensions.get('window').width * 0.03),
+        marginVertical: '5%',
     },
     firstAndLastPage: {
         justifyContent: 'center',

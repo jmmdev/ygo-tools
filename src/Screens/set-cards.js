@@ -184,7 +184,8 @@ const SetCardsScreen = ({navigation, route}) => {
                 {!isInfoLoading &&
                     <>
                     {cardList.current && cardList.current.length > 0 &&
-                    <ScrollView ref={mySetsList} style={styles.cardsContainer} contentContainerStyle={styles.cardsContent}>
+                    <ScrollView ref={mySetsList} contentContainerStyle={styles.cardsContent}>
+                        <View style={styles.cardsContainer}>
                         {
                             pageCardList.current.map((card, index) => {
                                 return (
@@ -202,7 +203,11 @@ const SetCardsScreen = ({navigation, route}) => {
                                 );
                             })
                         }
+                        </View>
                         <View style={styles.pagesContainer}>
+                            {(currentPage.current === 0 && numberOfPages.current === 2 || currentPage.current === 1 && numberOfPages.current > 2) &&
+                            <View style={{width: deviceWidth * 0.07}} />
+                            }
                             {currentPage.current > 1 &&
                             <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(0)}>
                                 <Icon color="#fff" name="page-first" size={deviceWidth * 0.07} type="material-community"/>
@@ -215,6 +220,9 @@ const SetCardsScreen = ({navigation, route}) => {
                                 <Icon color="#fff" name="page-last" size={deviceWidth * 0.07} type="material-community"/>
                             </TouchableHighlight>
                             }
+                            {(currentPage.current === numberOfPages.current - 1 && numberOfPages.current === 2 || currentPage.current === numberOfPages.current - 2 && numberOfPages.current > 2) &&
+                        <View style={{width: deviceWidth * 0.07}} />
+                        }
                         </View>
                     </ScrollView>
                     }
@@ -304,10 +312,13 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         textAlign: 'center',
     },
-    cardsContainer: {
+    cardsContent: {
+        flexGrow: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         padding: '5%',
     },
-    cardsContent: {
+    cardsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
@@ -351,7 +362,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        marginBottom: '15%',
+        marginTop: '7.5%',
+        marginBottom: '2.5%',
         gap: Math.max(16, Dimensions.get('window').width * 0.03),
     },
     firstAndLastPage: {

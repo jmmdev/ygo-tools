@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 
 import { Icon } from '@rneui/themed';
@@ -53,7 +53,7 @@ const SearchCardName = ({showEnterNameFunction, cardSelectionFunction, cardEleme
                                     numberOfPages.current = Math.ceil(cardList.current.length / pagesResultsLength);
 
                                     if (myFlatList.current) {
-                                        myFlatList.current.scrollToIndex({animated: false, index: 0});
+                                        myFlatList.current.scrollTo({animated: false, y: 0});
                                     }
                                     setUpdatingList(false);
                                 } catch (e) {
@@ -97,7 +97,7 @@ const SearchCardName = ({showEnterNameFunction, cardSelectionFunction, cardEleme
             currentPage.current = page;
             pageCardList.current = cardList.current.slice(page * pagesResultsLength, (page + 1) * pagesResultsLength < cardList.current.length ? (page + 1) * pagesResultsLength : cardList.current.length);
             setUpdatingList(false);
-            myFlatList.current.scrollToIndex({animated: false, index: 0});
+            myFlatList.current.scrollTo({animated: false, y: 0});
         }, 1000);
     };
 
@@ -174,73 +174,76 @@ const SearchCardName = ({showEnterNameFunction, cardSelectionFunction, cardEleme
             {
             cardList.current && cardList.current.length > 0 &&
             <>
-                <FlatList
-                style={{padding: '5%'}}
-                ItemSeparatorComponent={<View style={{height: 24}} />}
-                ref={myFlatList}
-                data={pageCardList.current}
-                keyExtractor={(item, index) => item.id}
-                renderItem={({item, index}) =>
-                    <>
-                        <TouchableOpacity onPress={() => {
-                            const myItemName = item.name;
-                            const added = cardSelectionFunction(item);
-                            let type;
+                <ScrollView ref={myFlatList} contentContainerStyle={styles.cardsContent}>
+                    <View style={{gap: Dimensions.get('window').height * 0.025}}>
+                    {
+                        pageCardList.current.map((item, index) => {
+                            return (
+                                <TouchableOpacity key={item.id} onPress={() => {
+                                    const myItemName = item.name;
+                                    const added = cardSelectionFunction(item);
+                                    let type;
 
-                            if (showToast) {
-                                if (added) {
-                                    cardList.current.splice(index + (pagesResultsLength * currentPage.current), 1);
-                                    numberOfPages.current = Math.ceil(cardList.current.length / pagesResultsLength);
+                                    if (showToast) {
+                                        if (added) {
+                                            cardList.current.splice(index + (pagesResultsLength * currentPage.current), 1);
+                                            numberOfPages.current = Math.ceil(cardList.current.length / pagesResultsLength);
 
-                                    if (cardList.current.length <= currentPage.current * pagesResultsLength) {
-                                        currentPage.current--;
+                                            if (cardList.current.length <= currentPage.current * pagesResultsLength) {
+                                                currentPage.current--;
+                                            }
+                                            pageCardList.current = cardList.current.slice(currentPage.current * pagesResultsLength, (currentPage.current + 1) * pagesResultsLength < cardList.current.length ? (currentPage.current + 1) * pagesResultsLength : cardList.current.length);
+
+                                            type = 'success';
+                                        } else {
+                                            type = 'danger';
+                                        }
+                                        toast.show(
+                                            myItemName,
+                                            {
+                                                type: type,
+                                                placement: 'bottom',
+                                                duration: 4000,
+                                                animationType: 'slide-in',
+                                            }
+                                        );
                                     }
-                                    pageCardList.current = cardList.current.slice(currentPage.current * pagesResultsLength, (currentPage.current + 1) * pagesResultsLength < cardList.current.length ? (currentPage.current + 1) * pagesResultsLength : cardList.current.length);
-
-                                    type = 'success';
-                                } else {
-                                    type = 'danger';
-                                }
-                                toast.show(
-                                    myItemName,
-                                    {
-                                        type: type,
-                                        placement: 'bottom',
-                                        duration: 4000,
-                                        animationType: 'slide-in',
-                                    }
-                                );
-                            }
-                        }}>
-                            <View style={styles.item}>
-                                <Image style={styles.cardImage} source={{uri: item.card_images[0].image_url}} />
-                                <View style={styles.cardData}>
-                                    <Text style={styles.cardId}>[{item.id}]</Text>
-                                    <Text style={styles.cardName}>{item.name}</Text>
-                                </View>
-                                <View style={{width: '10%', alignSelf: 'flex-start'}}>
-                                    <Icon style={cardIconTransform} color="#ffffff80" name={cardElementIcon} size={Math.max(24, deviceWidth * 0.05)} type="material-community"/>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                        {index === pageCardList.current.length - 1 &&
-                        <View style={styles.pagesContainer}>
-                            {currentPage.current > 1 &&
+                                }}>
+                                    <View style={styles.item}>
+                                        <Image style={styles.cardImage} source={{uri: item.card_images[0].image_url}} />
+                                        <View style={styles.cardData}>
+                                            <Text style={styles.cardId}>[{item.id}]</Text>
+                                            <Text style={styles.cardName}>{item.name}</Text>
+                                        </View>
+                                        <View style={{width: '10%', alignSelf: 'flex-start'}}>
+                                            <Icon style={cardIconTransform} color="#ffffff80" name={cardElementIcon} size={Math.max(24, deviceWidth * 0.05)} type="material-community"/>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })
+                    }
+                    </View>
+                    <View style={styles.pagesContainer}>
+                        {(currentPage.current === 0 && numberOfPages.current === 2 || currentPage.current === 1 && numberOfPages.current > 2) &&
+                            <View style={{width: deviceWidth * 0.07}} />
+                        }
+                        {currentPage.current > 1 &&
                             <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(0)}>
                                 <Icon color="#fff" name="page-first" size={22} type="material-community"/>
                             </TouchableHighlight>
-                            }
-                            {showPages()}
-                            {currentPage.current < numberOfPages.current - 2 &&
+                        }
+                        {showPages()}
+                        {currentPage.current < numberOfPages.current - 2 &&
                             <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(numberOfPages.current - 1)}>
                                 <Icon color="#fff" name="page-last" size={22} type="material-community"/>
                             </TouchableHighlight>
-                            }
-                        </View>
                         }
-                    </>
-                }
-                />
+                        {(currentPage.current === numberOfPages.current - 1 && numberOfPages.current === 2 || currentPage.current === numberOfPages.current - 2 && numberOfPages.current > 2) &&
+                            <View style={{width: deviceWidth * 0.07}} />
+                        }
+                    </View>
+                </ScrollView>
             </>
             }
         </>
@@ -350,6 +353,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    cardsContent: {
+        flexGrow: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '5%',
+    },
     item: {
         width: '100%',
         display: 'flex',
@@ -384,7 +393,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'row',
         marginTop: '7.5%',
-        marginBottom: '12.5%',
+        marginBottom: '2.5%',
         gap: Math.max(16, Dimensions.get('window').width * 0.03),
     },
     firstAndLastPage: {

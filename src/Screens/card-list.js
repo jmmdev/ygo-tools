@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, Dimensions, FlatList, Image, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, Dimensions, Image, ImageBackground, SafeAreaView, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '@rneui/themed';
@@ -13,7 +13,6 @@ const CardListScreen = ({navigation}) => {
     const [showDeleteOptions, setShowDeleteOptions] = useState(false);
     const [showSortingOptions, setShowSortingOptions] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [language, setLanguage] = useState(null);
     const [wait, setWait]  = useState(false);
     const [sorting, setSorting] = useState(null);
     const [idsToRemove, setIdsToRemove] = useState([]);
@@ -51,21 +50,17 @@ const CardListScreen = ({navigation}) => {
     useEffect(() => {
         const loadCardList = async () => {
             setIsInfoLoading(true);
-            const settings = await AsyncStorage.getItem('settings');
-            const settingsLg = settings ? JSON.parse(settings).language : 'en';
-
-            setLanguage(settingsLg);
 
             const allKeys = await AsyncStorage.getAllKeys();
             const keys = allKeys.filter(key => !isNaN(Number(key)));
             if (keys != null) {
                 const result = await AsyncStorage.multiGet(keys);
                 if (result != null) {
-                    cardList.current = await extractValues(result, settingsLg);
+                    cardList.current = await extractValues(result);
                     pageCardList.current = cardList.current.slice(0, resultsLength < cardList.current.length ? resultsLength : cardList.current.length);
                     numberOfPages.current = Math.ceil(cardList.current.length / resultsLength);
                     if (myFlatList.current) {
-                        myFlatList.current.scrollToIndex({animated: false, index: 0});
+                        myFlatList.current.scrollTo({animated: false, y: 0});
                     }
                     setSorting(0);
                     setIsInfoLoading(false);
@@ -73,37 +68,10 @@ const CardListScreen = ({navigation}) => {
             }
         };
 
-        const extractValues = async (pairs, lg) => {
+        const extractValues = async (pairs) => {
             let res = [];
             for (let pair of pairs) {
                 const value = JSON.parse(pair[1]);
-
-                try {
-                    if (!(lg in value.name[0])) {
-                        const cardInfo = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php?id=' + value.id + (lg !== 'en' ? ('&language=' + lg) : ''));
-
-                        if (cardInfo.ok) {
-                            const translation = await cardInfo.json();
-
-                                let translations = (JSON.stringify(value.desc[0])).slice(0, -1);
-                                let names = (JSON.stringify(value.name[0])).slice(0, -1);
-
-                                const desc = JSON.stringify(translation.data[0].desc);
-                                const name = JSON.stringify(translation.data[0].name);
-
-                                translations += ', "' + lg + '":' + desc + '}';
-                                names += ', "' + lg + '":' + name + '}';
-
-                                value.desc[0] = JSON.parse(translations);
-                                value.name[0] = JSON.parse(names);
-
-                                await AsyncStorage.setItem(value.id.toString(), JSON.stringify(value));
-                        }
-                    }
-                } catch (e) {
-                    console.log(e);
-                }
-
                 res.push(value);
             }
             res.sort((a, b) => (a.id - b.id));
@@ -168,10 +136,10 @@ const CardListScreen = ({navigation}) => {
                     cardList.current.sort((a, b) => -(a.id - b.id));
                     break;
                 case 2 :
-                    cardList.current.sort((a, b) => ((a.name[0][language]).localeCompare(b.name[0][language])));
+                    cardList.current.sort((a, b) => ((a.name[0].en).localeCompare(b.name[0].en)));
                     break;
                 case 3 :
-                    cardList.current.sort((a, b) => -((a.name[0][language]).localeCompare(b.name[0][language])));
+                    cardList.current.sort((a, b) => -((a.name[0].en).localeCompare(b.name[0].en)));
                     break;
             }
             setSorting(sort);
@@ -191,7 +159,7 @@ const CardListScreen = ({navigation}) => {
             pageCardList.current = cardList.current.slice(page * resultsLength, (page + 1) * resultsLength < cardList.current.length ? (page + 1) * resultsLength : cardList.current.length);
             setWait(false);
             if (myFlatList.current) {
-                myFlatList.current.scrollToIndex({animated: false, index: 0});
+                myFlatList.current.scrollTo({animated: false, y: 0});
             }
         }, 1000);
     };
@@ -215,7 +183,6 @@ const CardListScreen = ({navigation}) => {
     return (
         <SafeAreaView>
             <ImageBackground source={bgImg} resizeMode="cover" style={styles.image}>
-
                 <Header navigation={navigation} title={'Card history'}
                 firstIcon={cardList.current && cardList.current.length > 1 && !idsToRemove.length > 0 ? 'sort'
                     : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? 'dots-vertical' : null}
@@ -315,78 +282,80 @@ const CardListScreen = ({navigation}) => {
                     </View>
                 </View>
                 }
-                {
-                cardList.current && cardList.current.length > 0 &&
-                <>
-                    <FlatList
-                        onTouchStart={() => setShowSortingOptions(false)}
-                        ref={myFlatList}
-                        keyExtractor={(item, index) => index}
-                        data={pageCardList.current}
-                        renderItem={({item, index}) =>
+                {cardList.current && cardList.current.length > 0 &&
+                <ScrollView ref={myFlatList} contentContainerStyle={styles.cardsContent}>
+                    <View style={{gap: Dimensions.get('window').height * 0.025}}>
+                        {
+                            pageCardList.current.map((item, index) => {
+                                return (
+                                    <TouchableOpacity key={item.id} style={[styles.item, {backgroundColor: idsToRemove.includes(item.id, 0) ? '#ffffff30' : 'transparent'}]} onLongPress={() => {
+                                        const indexUpdated = [...idsToRemove];
+                                        if (idsToRemove.includes(item.id)) {
+                                            indexUpdated.splice(indexUpdated.indexOf(item.id), 1);
+                                        }
+                                        else {
+                                            indexUpdated.push(item.id);
+                                        }
+                                        if (!indexUpdated.length > 0) {
+                                            setShowDeleteOptions(false);
+                                        }
+                                        setIdsToRemove(indexUpdated);
+                                    } } onPress={() => {
+                                        if (idsToRemove.length > 0) {
+                                            const indexUpdated = [...idsToRemove];
+                                            if (idsToRemove.includes(item.id)) {
+                                                indexUpdated.splice(indexUpdated.indexOf(item.id), 1);
+                                            }
+                                            else {
+                                                indexUpdated.push(item.id);
+                                            }
+                                            if (!indexUpdated.length > 0) {
+                                                setShowDeleteOptions(false);
+                                            }
+                                            setIdsToRemove(indexUpdated);
+                                        }
+                                        else {
+                                            navigation.navigate('CardInfo', {id: item.id.toString()});
+                                        }
+                                    }}>
+                                        <Image style={styles.cardImage} source={{uri: item.card_images[0].image_url}}/>
+                                        <View style={styles.cardData}>
+                                            <Text style={styles.cardId}>{item.id.toString().length < 8 ? '[0' + item.id + ']' : '[' + item.id + ']'}</Text>
+                                            <Text style={styles.cardName}>
+                                                {item.name[0].en ? item.name[0].en : item.name[0].en}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })
+                        }
+                    </View>
+                    <View style={styles.pagesContainer}>
+                        {!idsToRemove.length > 0 &&
                         <>
-                            <TouchableOpacity style={[styles.item, {backgroundColor: idsToRemove.includes(item.id, 0) ? '#ffffff30' : 'transparent'}]} onLongPress={() => {
-                                const indexUpdated = [...idsToRemove];
-                                if (idsToRemove.includes(item.id)) {
-                                    indexUpdated.splice(indexUpdated.indexOf(item.id), 1);
-                                }
-                                else {
-                                    indexUpdated.push(item.id);
-                                }
-                                if (!indexUpdated.length > 0) {
-                                    setShowDeleteOptions(false);
-                                }
-                                setIdsToRemove(indexUpdated);
-                            } } onPress={() => {
-                                if (idsToRemove.length > 0) {
-                                    const indexUpdated = [...idsToRemove];
-                                    if (idsToRemove.includes(item.id)) {
-                                        indexUpdated.splice(indexUpdated.indexOf(item.id), 1);
-                                    }
-                                    else {
-                                        indexUpdated.push(item.id);
-                                    }
-                                    if (!indexUpdated.length > 0) {
-                                        setShowDeleteOptions(false);
-                                    }
-                                    setIdsToRemove(indexUpdated);
-                                }
-                                else {
-                                    navigation.navigate('CardInfo', {id: item.id.toString()});
-                                }
-                            }}>
-                                <Image style={styles.cardImage} source={{uri: item.card_images[0].image_url}}/>
-                                <View style={styles.cardData}>
-                                    <Text style={styles.cardId}>{item.id.toString().length < 8 ? '[0' + item.id + ']' : '[' + item.id + ']'}</Text>
-                                    <Text style={styles.cardName}>
-                                        {item.name[0][language] ? item.name[0][language] : item.name[0].en}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                            {index === pageCardList.current.length - 1 &&
-                            <View style={styles.pagesContainer}>
-                            {!idsToRemove.length > 0 &&
-                            <>
-                                {
-                                currentPage.current > 1 &&
-                                <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(0)}>
-                                    <Icon color="#fff" name="page-first" size={deviceWidth * 0.07} type="material-community"/>
-                                </TouchableHighlight>
-                                }
-                                {showPages()}
-                                {
-                                currentPage.current < numberOfPages.current - 2 &&
-                                <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(numberOfPages.current - 1)}>
-                                    <Icon color="#fff" name="page-last" size={deviceWidth * 0.07} type="material-community"/>
-                                </TouchableHighlight>
-                                }
-                            </>
+                            {(currentPage.current === 0 && numberOfPages.current === 2 || currentPage.current === 1 && numberOfPages.current > 2) &&
+                            <View style={{width: deviceWidth * 0.07}} />
                             }
-                            </View>
+                            {
+                            currentPage.current > 1 &&
+                            <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(0)}>
+                                <Icon color="#fff" name="page-first" size={deviceWidth * 0.07} type="material-community"/>
+                            </TouchableHighlight>
                             }
+                            {showPages()}
+                            {
+                            currentPage.current < numberOfPages.current - 2 &&
+                            <TouchableHighlight style={styles.firstAndLastPage} underlayColor={'none'} onPress={() => showPage(numberOfPages.current - 1)}>
+                                <Icon color="#fff" name="page-last" size={deviceWidth * 0.07} type="material-community"/>
+                            </TouchableHighlight>
+                            }
+                            {(currentPage.current === numberOfPages.current - 1 && numberOfPages.current === 2 || currentPage.current === numberOfPages.current - 2 && numberOfPages.current > 2) &&
+                        <View style={{width: deviceWidth * 0.07}} />
+                        }
                         </>
-                    }/>
-                </>
+                        }
+                    </View>
+                </ScrollView>
                 }
             </ImageBackground>
         </SafeAreaView>
@@ -541,12 +510,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#ffdd00',
     },
+    cardsContent: {
+        flexGrow: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '5%',
+    },
     item: {
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        padding: '5%',
     },
     cardImage: {
         width: '20%',
@@ -576,7 +550,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'row',
         marginTop: '7.5%',
-        marginBottom: '7.5%',
+        marginBottom: '2.5%',
         gap: Math.max(16, Dimensions.get('window').width * 0.03),
     },
     firstAndLastPage: {
