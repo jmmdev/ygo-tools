@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 
 import { Icon } from '@rneui/themed';
@@ -203,7 +203,7 @@ const SearchCardName = ({showEnterNameFunction, cardSelectionFunction, cardEleme
                                             {
                                                 type: type,
                                                 placement: 'bottom',
-                                                duration: 4000,
+                                                duration: 2000,
                                                 animationType: 'slide-in',
                                             }
                                         );
