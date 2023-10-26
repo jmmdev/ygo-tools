@@ -675,11 +675,12 @@ const DeckViewerScreen = ({navigation, route}) => {
                         }}>
                             <Text style={styles.optionText}>Modify deck list</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.optionContainer, {borderBottomLeftRadius: 8}]} onPress={() => {
+                        <TouchableOpacity style={[styles.optionContainer, {borderBottomLeftRadius: 8, gap: 8}]} onPress={() => {
                             setShowOptions(false);
                             setDeleteConfirmation(true);
                         }}>
-                            <Text style={[styles.optionText, {color: '#f55'}]}>Delete this deck</Text>
+                            <Text style={[styles.optionText, {color: '#f55'}]}>Delete deck</Text>
+                            <Icon color="#f55" name="warning" size={20} type="material"/>
                         </TouchableOpacity>
                     </View>
                     }

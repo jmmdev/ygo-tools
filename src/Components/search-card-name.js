@@ -203,7 +203,7 @@ const SearchCardName = ({showEnterNameFunction, cardSelectionFunction, cardEleme
                                             {
                                                 type: type,
                                                 placement: 'bottom',
-                                                duration: 2000,
+                                                duration: 1000,
                                                 animationType: 'slide-in',
                                             }
                                         );
