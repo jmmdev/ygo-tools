@@ -252,6 +252,7 @@ const DeckListEditorScreen = ({navigation, route}) => {
             const value = await AsyncStorage.getItem('decks');
 
             if (value) {
+                console.log('YES DECK');
                 const name = nameToEdit.current;
                 let decks = JSON.parse(value);
 
@@ -298,6 +299,7 @@ const DeckListEditorScreen = ({navigation, route}) => {
                 }
             }
             else {
+                console.log('NO DECK');
                 setWait(false);
             }
         } catch (e) {
@@ -557,9 +559,9 @@ const DeckListEditorScreen = ({navigation, route}) => {
                     {
                     savedConfirmation &&
                     <View style={styles.confirmContainer}>
-                        <View style={[styles.confirmFrame, {height: '25%', justifyContent: 'center', alignItems: 'center'}]}>
-                            <Icon color="#0f9" name="check-circle-outline" size={72} type="material-community"/>
+                        <View style={styles.savedFrame}>
                             <Text style={styles.deckSavedText}>Deck saved!</Text>
+                            <Icon color="#0f9" name="check" size={40} type="material-community"/>
                         </View>
                     </View>
                     }
@@ -679,6 +681,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#000000c0',
         zIndex: 600,
     },
+    savedFrame: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     confirmFrame: {
         width: '80%',
         padding: '5%',
@@ -721,7 +727,7 @@ const styles = StyleSheet.create({
         color: '#ffdd00',
     },
     deckSavedText: {
-        fontSize: 48,
+        fontSize: 32,
         color: '#fff',
     },
     wait: {

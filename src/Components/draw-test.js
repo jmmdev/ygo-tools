@@ -2,7 +2,7 @@
 import { Switch } from '@rneui/base';
 import { Icon } from '@rneui/themed';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, BackHandler, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, BackHandler, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const DrawTest = ({deck, setDrawTest}) => {
     const slideAnim = useRef(new Animated.Value(Dimensions.get('screen').height)).current;
@@ -12,6 +12,7 @@ const DrawTest = ({deck, setDrawTest}) => {
     const [initialHand, setInitialHand] = useState(null);
     const [actualDeck, setActualDeck] = useState(null);
     const [canDraw, setCanDraw] = useState(true);
+    const [canShuffle, setCanShuffle] = useState(true);
     const [showNextDraw, setShowNextDraw] = useState(false);
 
     const additionalDraws = useRef([]);
@@ -71,6 +72,7 @@ const DrawTest = ({deck, setDrawTest}) => {
             setInitialHand(cards.slice(0, 5));
             setActualDeck(cards.slice(5, cards.length));
             setCanDraw(true);
+            setCanShuffle(true);
         }
     };
 
@@ -95,6 +97,7 @@ const DrawTest = ({deck, setDrawTest}) => {
             updatedDeck.splice(0, 1);
 
             setCanDraw(updatedDeck.length > 0);
+            setCanShuffle(updatedDeck.length > 1);
             setActualDeck(updatedDeck);
         }
     };
@@ -120,14 +123,17 @@ const DrawTest = ({deck, setDrawTest}) => {
                             }
                         </View>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <Text style={styles.drawText}>Draw board</Text>
-                            {actualDeck && actualDeck.length > 0 &&
-                            <View style={[styles.switchContainer]}>
-                                <Text style={styles.switchText}>Show next draw</Text>
-                                <Switch thumbColor={showNextDraw ? '#fff' : '#999'} trackColor={{true: '#0c6', false: '#555'}}
-                                onValueChange={() => setShowNextDraw(!showNextDraw)}value={showNextDraw} />
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={styles.drawText}>Draw board</Text>
+                                {actualDeck &&
+                                <Text style={styles.countText}>Card count: {actualDeck.length}</Text>
+                                }
                             </View>
-                            }
+                            <View style={[styles.switchContainer, {opacity: !actualDeck || actualDeck && !actualDeck.length > 0 ? 0.5 : 1}]}>
+                                <Text style={styles.switchText}>Show draws</Text>
+                                <Switch disabled={!actualDeck || actualDeck && !actualDeck.length > 0} thumbColor={showNextDraw ? '#fff' : '#999'} trackColor={{true: '#0c6', false: '#555'}}
+                                onValueChange={() => setShowNextDraw(!showNextDraw)} value={showNextDraw} />
+                            </View>
                         </View>
                         <View style={styles.nextDraws}>
                             <ScrollView ref={scrollView} en persistentScrollbar={true} onContentSizeChange={() => scrollView.current.scrollToEnd({animated: false})} contentContainerStyle={styles.nextDrawsContent}>
@@ -145,20 +151,32 @@ const DrawTest = ({deck, setDrawTest}) => {
                                     <Image style={[styles.cardImage, {opacity: 0.5}]} source={{uri: actualDeck[0]}}/>
                                 }
                             </ScrollView>
+                            {!canShuffle && actualDeck.length > 1 &&
+                            <View style={styles.shufflingIndicator}>
+                                <ActivityIndicator size={'large'} color={'#fff9'} />
+                                <Text style={styles.shufflingText}>Shuffling...</Text>
+                            </View>
+                            }
                         </View>
                 </View>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.button} onPress={() => initializeDeck()}>
+                    <TouchableOpacity style={[styles.button, {opacity: !canShuffle && actualDeck.length > 1 ? 0.5 : 1}]} disabled={!canShuffle && actualDeck.length > 1} onPress={() => initializeDeck()}>
                         <Text style={styles.buttonText}>RESET</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, {opacity: actualDeck && actualDeck.length > 1 ? 1 : 0.5}]} disabled={!(actualDeck && actualDeck.length > 1)} onPress={() => {
+                    <TouchableOpacity style={[styles.button, {opacity: actualDeck && actualDeck.length > 1 && canShuffle ? 1 : 0.5}]} disabled={!(actualDeck && actualDeck.length > 1 && canDraw)} onPress={() => {
+                        setCanShuffle(false);
+                        setCanDraw(false);
                         let deckToShuffle = [...actualDeck];
                         doShuffleDeck(deckToShuffle);
-                        setActualDeck(deckToShuffle);
+                        setTimeout(() => {
+                            setActualDeck(deckToShuffle);
+                            setCanShuffle(true);
+                            setCanDraw(true);
+                        }, 1500);
                     }}>
                         <Text style={styles.buttonText}>SHUFFLE</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, {opacity: actualDeck && canDraw ? 1 : 0.5}]} disabled={!(actualDeck && canDraw)} onPress={() => draw()}>
+                    <TouchableOpacity style={[styles.button, {opacity: actualDeck && canDraw  ? 1 : 0.5}]} disabled={!(actualDeck && canDraw)} onPress={() => draw()}>
                         <Text style={styles.buttonText}>DRAW</Text>
                     </TouchableOpacity>
                 </View>
@@ -168,7 +186,6 @@ const DrawTest = ({deck, setDrawTest}) => {
 };
 
 const dimensions = Dimensions.get('window');
-const deviceWidth = dimensions.width;
 const cardHeight = Math.floor((dimensions.width - 12) * 0.8 * 0.2 / 0.686);
 
 const styles = StyleSheet.create({
@@ -189,13 +206,14 @@ const styles = StyleSheet.create({
     },
     initialText: {
         fontSize: 17,
-        color: '#fff',
+        fontWeight: 700,
+        color: '#0a090e',
         paddingVertical: 4,
         paddingHorizontal: 8,
         textAlign: 'center',
         borderWidth: 1,
-        borderColor: '#0f6',
-        backgroundColor: '#0a090e',
+        borderColor: '#bfc',
+        backgroundColor: '#bfc',
         borderBottomWidth: 0,
     },
     initialHand: {
@@ -203,26 +221,35 @@ const styles = StyleSheet.create({
         padding: '5%',
         flexDirection: 'row',
         borderWidth: 1,
-        borderColor: '#0f6',
+        borderColor: '#bfc',
         marginBottom: '10%',
         backgroundColor: '#0a090e',
         gap: 3,
     },
     drawText: {
         fontSize: 17,
-        color: '#fff',
+        fontWeight: 700,
+        color: '#0a090e',
         paddingVertical: 4,
         paddingHorizontal: 8,
         textAlign: 'center',
         borderWidth: 1,
-        borderColor: '#fc0',
-        backgroundColor: '#0a090e',
+        borderColor: '#ffb',
+        backgroundColor: '#ffb',
+        borderBottomWidth: 0,
+    },
+    countText: {
+        fontSize: 16,
+        color: '#ffb',
+        fontWeight: 600,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        textAlign: 'center',
         borderBottomWidth: 0,
     },
     switchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: deviceWidth * 0.01,
     },
     switchText: {
         fontSize: 16,
@@ -231,7 +258,7 @@ const styles = StyleSheet.create({
     nextDraws: {
         flex: 1,
         borderWidth: 1,
-        borderColor: '#fc0',
+        borderColor: '#ffb',
         overflow: 'hidden',
         backgroundColor: '#0a090e',
     },
@@ -249,6 +276,20 @@ const styles = StyleSheet.create({
         width: cardHeight * 0.686,
         aspectRatio: 0.686,
         opacity: 0.85,
+    },
+    shufflingIndicator: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#0008',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 8,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+    },
+    shufflingText: {
+        fontSize: 22,
     },
     footer: {
         width: '100%',

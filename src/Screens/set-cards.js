@@ -13,6 +13,7 @@ const SetCardsScreen = ({navigation, route}) => {
     const [wait, setWait]  = useState(false);
     const [changed, setChanged] = useState(0);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [savedConfirmation, setSavedConfirmation] = useState(false);
 
     const setName = useRef('');
     const cardList = useRef(null);
@@ -129,7 +130,11 @@ const SetCardsScreen = ({navigation, route}) => {
                 (collection[setIndex.current]).cards = [...cardList.current];
                 await AsyncStorage.setItem('collection', JSON.stringify(collection));
                 setWait(false);
-                setChanged(0);
+                setSavedConfirmation(true);
+                setTimeout(() => {
+                    setChanged(0);
+                    setSavedConfirmation(false);
+                }, 1500);
             } else {
                 console.log('COLLECTION NOT FOUND');
                 setWait(false);
@@ -173,6 +178,15 @@ const SetCardsScreen = ({navigation, route}) => {
                 <View style={styles.wait}>
                     <ActivityIndicator color={'#ffffff'} size={64}/>
                     <Text style={styles.waitText}>Please wait...</Text>
+                </View>
+                }
+                {
+                savedConfirmation &&
+                <View style={styles.confirmContainer}>
+                    <View style={styles.savedFrame}>
+                        <Text style={styles.deckSavedText}>Collection saved!</Text>
+                        <Icon color="#0f9" name="check" size={40} type="material-community"/>
+                    </View>
                 </View>
                 }
                 {
@@ -400,6 +414,14 @@ const styles = StyleSheet.create({
         left: 0,
         backgroundColor: '#000000c0',
         zIndex: 600,
+    },
+    savedFrame: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    deckSavedText: {
+        fontSize: 32,
+        color: '#fff',
     },
     confirmFrame: {
         width: '80%',

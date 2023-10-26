@@ -724,7 +724,7 @@ const DeckViewerScreen = ({navigation, route}) => {
                     <View style={styles.qrContainer}>
                         <QRCode size={Math.min(qrSize, 400)} value={qrUrl} quietZone={16} />
                         <TouchableOpacity onPress={() => setShowQR(false)} activeOpacity={0.75}>
-                            <Icon color="#fffa" name="close-o" size={72} type="evilicon"/>
+                            <Icon color="#fffa" name="close-o" size={deviceWidth * 0.12} type="evilicon"/>
                         </TouchableOpacity>
                     </View>
                     }
@@ -772,7 +772,7 @@ const DeckViewerScreen = ({navigation, route}) => {
                         <View style={styles.confirmFrame}>
                             <View style={styles.titleContainer}>
                                 <Text style={styles.confirmTitle}>Warning</Text>
-                                <Icon color="#ffffff" name="alert-circle-outline" size={22} type="material-community" style={{marginLeft: 4}}/>
+                                <Icon color="#ffffffc0" name="warning" size={22} type="material" style={{marginLeft: 4}}/>
                             </View>
                             <Text style={styles.confirmText}>Delete '{text}' from your decks?</Text>
                             <View style={styles.buttonsContainer}>
@@ -789,9 +789,9 @@ const DeckViewerScreen = ({navigation, route}) => {
                     {
                     savedConfirmation &&
                     <View style={styles.confirmContainer}>
-                        <View style={[styles.confirmFrame, {height: '25%', justifyContent: 'center', alignItems: 'center'}]}>
-                            <Icon color="#0f9" name="check-circle-outline" size={72} type="material-community"/>
+                        <View style={styles.savedFrame}>
                             <Text style={styles.deckSavedText}>Deck saved!</Text>
+                            <Icon color="#0f9" name="check" size={40} type="material-community"/>
                         </View>
                     </View>
                     }
@@ -971,6 +971,10 @@ const styles = StyleSheet.create({
         padding: '5%',
         backgroundColor: '#24242e',
     },
+    savedFrame: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     titleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -1024,7 +1028,7 @@ const styles = StyleSheet.create({
         color: '#ffdd00',
     },
     deckSavedText: {
-        fontSize: 48,
+        fontSize: 32,
         color: '#fff',
     },
     wait: {
