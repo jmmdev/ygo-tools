@@ -226,10 +226,17 @@ const DeckViewerScreen = ({navigation, route}) => {
                 }
 
                 setCroppedImages(images);
-                setFullList([mainList, extraList, sideList]);
+                if (mainList.length > 0 || extraList.length > 0 || sideList > 0) {
+                    setFullList([mainList, extraList, sideList]);
+                    setIsInfoLoading(false);
+                }
+                else {
+                    setTimeout(() => {
+                        navigation.navigate('DeckExplorer', {deckWasInvalid: true});
+                        setIsInfoLoading(false);
+                    }, 1500);
+                }
             }
-
-            setIsInfoLoading(false);
         };
 
         async function searchByCode(code) {
@@ -249,7 +256,7 @@ const DeckViewerScreen = ({navigation, route}) => {
         if (deck) {
             loadDeckContents();
         }
-    }, [deck, wait]);
+    }, [deck, navigation, wait]);
 
     const formatPrice = (price) => {
         return Math.round(price * 100) / 100;
@@ -409,7 +416,7 @@ const DeckViewerScreen = ({navigation, route}) => {
 
             return url;
         } catch (e) {
-            console.log('Error while creating new url. Please try again');
+            console.log(e.message, 'Error while creating new url. Please try again');
             setWait(false);
         }
     };

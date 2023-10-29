@@ -22,21 +22,21 @@ const MainScreen = ({navigation, route}) => {
                     <View style={styles.mainButtonBg}>
                         <TouchableOpacity onPress={() => navigation.navigate('CardSearch')} style={styles.mainButton} activeOpacity={0.9}>
                             <ImageBackground style={{width: deviceWidth, height: imageHeight, justifyContent: 'center'}} source={card}>
-                                <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>Card Search</Text>
+                                <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>{'Card\nSearch'}</Text>
                             </ImageBackground>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.mainButtonBg}>
-                        <TouchableOpacity onPress={() => navigation.navigate('DeckExplorer')} style={styles.mainButton} activeOpacity={0.9}>
+                        <TouchableOpacity onPress={() => navigation.navigate('DeckExplorer', {deckWasInvalid: false})} style={styles.mainButton} activeOpacity={0.9}>
                             <ImageBackground style={{width: deviceWidth, height: imageHeight, justifyContent: 'center'}} source={deck}>
-                                <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>Deck Explorer</Text>
+                                <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>{'Deck\nExplorer'}</Text>
                             </ImageBackground>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.mainButtonBg}>
                         <TouchableOpacity onPress={() => navigation.navigate('MyCollection')} style={styles.mainButton} activeOpacity={0.9}>
                             <ImageBackground style={{width: deviceWidth, height: imageHeight, justifyContent: 'center'}} source={collection}>
-                                <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>My Collection</Text>
+                                <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>{'My\nCollection'}</Text>
                             </ImageBackground>
                         </TouchableOpacity>
                     </View>

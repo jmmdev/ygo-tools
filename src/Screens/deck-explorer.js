@@ -9,6 +9,7 @@ import RNFS from 'react-native-fs';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import Header from '../Components/header';
+import { URL } from 'react-native-url-polyfill';
 
 const deviceWidth = Dimensions.get('window').width;
 
@@ -49,6 +50,11 @@ const DeckExplorerScreen = ({navigation, route}) => {
                 if (value) {
                     setDecks(JSON.parse(value).sort((a, b) => a.name.localeCompare(b.name)));
                 }
+                if (route.params && route.params.deckWasInvalid) {
+                    errorTitle.current = 'Error while retrieving deck info';
+                    errorMessage.current = 'There was an error while processing your request. Link works correctly but no cards were found.\n\nPlease check it out and try again';
+                    setShowMessage(true);
+                }
             } catch (e) {
                 errorMessage.current = 'There was an error while retrieving your decks. Please go back and try again.';
                 setShowMessage(true);
@@ -58,7 +64,7 @@ const DeckExplorerScreen = ({navigation, route}) => {
         if (isFocused) {
             getDecks();
         }
-    }, [isFocused]);
+    }, [isFocused, route.params, route.params.deckWasInvalid]);
 
     const loadYdk = () => {
         pickSingle({
@@ -84,21 +90,53 @@ const DeckExplorerScreen = ({navigation, route}) => {
     };
 
     const loadQR = async (url) => {
-        const response = await fetch(url + '/raw', {
-            headers: {
-                'Referer': 'https://rentry.co',
-                'Accept': 'application/json',
-                'Content-Type': 'text/plain',
-            },
-        });
-        if (response.ok) {
-            const paste_content = await response.text();
+        const myUrl = new URL(url);
 
-            const deck = {name: url.replace('https://rentry.co/', 'deck-'), content: paste_content, img: null};
-            navigation.navigate('DeckViewer', {deck: deck, new: true});
+        const pathNameRoutes = (myUrl.pathname.split('/')).filter(str => str !== '');
+
+        let validUrl = null;
+        const regExp = /^[a-zA-Z0-9]+$/;
+
+        if (pathNameRoutes.length === 1) {
+            validUrl =
+                myUrl.protocol === 'https:' &&
+                    myUrl.hostname === 'rentry.co' &&
+                    myUrl.pathname &&
+                    regExp.test(pathNameRoutes[0]);
+        } else  if (pathNameRoutes.length === 2) {
+            validUrl =
+                myUrl.protocol === 'https:' &&
+                myUrl.hostname === 'rentry.co' &&
+                myUrl.pathname &&
+                regExp.test(pathNameRoutes[0]) &&
+                pathNameRoutes[1] === 'raw';
         } else {
-            errorTitle.current = 'Error while retrieving deck info';
-            errorMessage.current = 'There was an error while reading the QR code. It may be a dead or an invalid link. Please check it out and try again';
+            validUrl = false;
+        }
+
+        if (validUrl) {
+            const actualUrl = url.includes('/raw') ? url : (url.charAt(url.length - 1) === '/' ? (url + 'raw') : (url + '/raw'));
+            const response = await fetch(actualUrl, {
+                headers: {
+                    'Referer': 'https://rentry.co',
+                    'Accept': 'application/json',
+                    'Content-Type': 'text/plain',
+                },
+            });
+            if (response.ok) {
+                const paste_content = await response.text();
+                console.log(paste_content);
+                const deck = {name: url.replace('https://rentry.co/', 'deck-'), content: paste_content, img: null};
+                navigation.navigate('DeckViewer', {deck: deck, new: true});
+            } else {
+                errorTitle.current = 'Error while retrieving deck info';
+                errorMessage.current = 'There was an error while processing your request. Possible dead link in QR code.\n\nPlease check it out and try again';
+                setShowMessage(true);
+            }
+        }
+        else {
+            errorTitle.current = 'Error with QR code';
+            errorMessage.current = 'There was an error with the QR code. It may be an invalid link.\n\nPlease check it out and try again';
             setShowMessage(true);
         }
         setShowScanner(false);
@@ -147,6 +185,9 @@ const DeckExplorerScreen = ({navigation, route}) => {
                 showScanner &&
                 <View style={styles.scannerContainer}>
                     <View style={styles.cameraContainer}>
+                        <View style={styles.qrFrameContainer}>
+                            <Image style={styles.qrFrame} source={require('../../assets/qr-scan-frame.png')} />
+                        </View>
                         <QRCodeScanner
                         onRead={(e) => loadQR(e.data)}
                         flashMode={RNCamera.Constants.FlashMode.auto}/>
@@ -162,7 +203,12 @@ const DeckExplorerScreen = ({navigation, route}) => {
                     <View style={styles.errorFrame}>
                         <Text style={styles.errorTitle}>{errorTitle.current}</Text>
                         <Text style={styles.errorText}>{errorMessage.current}</Text>
-                        <TouchableOpacity style={styles.errorDismiss} onPress={() => setShowMessage(false)}>
+                        <TouchableOpacity style={styles.errorDismiss} onPress={() => {
+                            setShowMessage(false);
+                            if (route.params.deckWasInvalid) {
+                                route.params.deckWasInvalid = false;
+                            }
+                        }}>
                             <Text style={styles.errorOkay}>Dismiss</Text>
                         </TouchableOpacity>
                     </View>
@@ -277,8 +323,21 @@ const styles = StyleSheet.create({
     cameraContainer: {
         width: '100%',
         aspectRatio: 1,
+        alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
+    },
+    qrFrameContainer: {
+        width: '65%',
+        aspectRatio: 1,
+        position: 'absolute',
+        zIndex: 700,
+        top: '17.5%',
+        left: '17.5%',
+    },
+    qrFrame: {
+       height: '100%',
+       aspectRatio: 1,
     },
     errorContainer: {
         width: '100%',

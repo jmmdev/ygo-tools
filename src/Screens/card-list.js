@@ -188,7 +188,8 @@ const CardListScreen = ({navigation}) => {
                     : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? 'dots-vertical' : null}
                 firstSize={deviceWidth * 0.09}
                 firstFunction={cardList.current && cardList.current.length > 0 && !idsToRemove.length > 0 ? () => setShowSortingOptions(!showSortingOptions)
-                : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? () => setShowDeleteOptions(!showDeleteOptions) : null} />
+                : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? () => setShowDeleteOptions(!showDeleteOptions) : null}
+                firstStyle={{opacity: showSortingOptions ? 0.5 : 1, backgroundColor: showSortingOptions ? '#000000c0' : 'transparent'}}/>
                 {
                 wait &&
                 <View style={styles.wait}>
