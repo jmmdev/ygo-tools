@@ -28,7 +28,7 @@ Moving into deck explorer tool we can see a(n empty) list. All decks we create w
 
 <br></br>
 Tapping on any deck will lead to the deck viewer screen where comprised cards will be shown and some tools and options are provided:
-- Create a show a QR code to share your deck with another user
+- Show a QR code to share your deck with another user
 - Test starting hands and draws to estimate the odds of getting specific cards
 - Show general edit options for your deck (edit name, display image in the deck list, cards contained or completely delete the deck)
 
