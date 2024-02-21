@@ -11,7 +11,9 @@ import { RNCamera } from 'react-native-camera';
 import Header from '../Components/header';
 import { URL } from 'react-native-url-polyfill';
 
-const deviceWidth = Dimensions.get('window').width;
+const dimensions = Dimensions.get('window');
+const deviceWidth = dimensions.width;
+const deviceHeight = dimensions.height;
 
 const DeckExplorerScreen = ({navigation, route}) => {
     const bg = require('../../assets/bg.png');
@@ -52,7 +54,7 @@ const DeckExplorerScreen = ({navigation, route}) => {
                 }
                 if (route.params && route.params.deckWasInvalid) {
                     errorTitle.current = 'Error while retrieving deck info';
-                    errorMessage.current = 'There was an error while processing your request. Link works correctly but no cards were found.\n\nPlease check it out and try again';
+                    errorMessage.current = 'There was an error while processing your request. Your deck could not be retrieved.\n\nPlease check it out and try again';
                     setShowMessage(true);
                 }
             } catch (e) {
@@ -125,7 +127,6 @@ const DeckExplorerScreen = ({navigation, route}) => {
             });
             if (response.ok) {
                 const paste_content = await response.text();
-                console.log(paste_content);
                 const deck = {name: url.replace('https://rentry.co/', 'deck-'), content: paste_content, img: null};
                 navigation.navigate('DeckViewer', {deck: deck, new: true});
             } else {
@@ -184,6 +185,7 @@ const DeckExplorerScreen = ({navigation, route}) => {
                 {
                 showScanner &&
                 <View style={styles.scannerContainer}>
+                    <View style={styles.cameraBlackFrame}/>
                     <View style={styles.cameraContainer}>
                         <View style={styles.qrFrameContainer}>
                             <Image style={styles.qrFrame} source={require('../../assets/qr-scan-frame.png')} />
@@ -192,9 +194,11 @@ const DeckExplorerScreen = ({navigation, route}) => {
                         onRead={(e) => loadQR(e.data)}
                         flashMode={RNCamera.Constants.FlashMode.auto}/>
                     </View>
-                    <TouchableOpacity onPress={() => setShowScanner(false)} style={{opacity: 0.75}} activeOpacity={1}>
-                            <Icon color="#ffffff" name="close-o" size={deviceWidth * 0.12} type="evilicon"/>
+                    <View style={[styles.cameraBlackFrame, {padding: 32, alignItems: 'center'}]}>
+                    <TouchableOpacity onPress={() => setShowScanner(false)} style={{width: '20%', aspectRatio: 1, justifyContent: 'center', opacity: 0.75}}>
+                        <Icon color="#ffffff" name="close-o" size={deviceWidth * 0.12} type="evilicon"/>
                     </TouchableOpacity>
+                    </View>
                 </View>
                 }
                 {
@@ -314,11 +318,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 32,
         position: 'absolute',
         zIndex: 600,
+    },
+    cameraBlackFrame: {
+        backgroundColor: '#000',
+        width: '100%',
+        height: (deviceHeight - deviceWidth) / 2,
     },
     cameraContainer: {
         width: '100%',

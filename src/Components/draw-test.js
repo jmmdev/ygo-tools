@@ -55,7 +55,10 @@ const DrawTest = ({deck, setDrawTest}) => {
             }
             doShuffleDeck(cards);
             setInitialHand(cards.slice(0, 5));
-            setActualDeck(cards.slice(5, cards.length));
+            const remainingDeck = cards.slice(5, cards.length);
+            setActualDeck(remainingDeck);
+            setCanDraw(remainingDeck.length > 0);
+            setCanShuffle(remainingDeck.length > 1);
         }
     }, [deckData]);
 
@@ -70,9 +73,10 @@ const DrawTest = ({deck, setDrawTest}) => {
             additionalDraws.current = [];
             doShuffleDeck(cards);
             setInitialHand(cards.slice(0, 5));
-            setActualDeck(cards.slice(5, cards.length));
-            setCanDraw(true);
-            setCanShuffle(true);
+            const remainingDeck = cards.slice(5, cards.length);
+            setActualDeck(remainingDeck);
+            setCanDraw(remainingDeck.length > 0);
+            setCanShuffle(remainingDeck.length > 1);
         }
     };
 
@@ -176,7 +180,7 @@ const DrawTest = ({deck, setDrawTest}) => {
                     }}>
                         <Text style={styles.buttonText}>SHUFFLE</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.button, {opacity: actualDeck && canDraw  ? 1 : 0.5}]} disabled={!(actualDeck && canDraw)} onPress={() => draw()}>
+                    <TouchableOpacity style={[styles.button, {opacity: actualDeck && canDraw ? 1 : 0.5}]} disabled={!(actualDeck && canDraw)} onPress={() => draw()}>
                         <Text style={styles.buttonText}>DRAW</Text>
                     </TouchableOpacity>
                 </View>

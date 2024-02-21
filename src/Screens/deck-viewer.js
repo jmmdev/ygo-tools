@@ -37,14 +37,14 @@ const DeckViewerScreen = ({navigation, route}) => {
     const [drawTest, setDrawTest] = useState(false);
     const [showImgZones, setShowImgZones] = useState(false);
     const [draggableInfo, setDraggableInfo] = useState(null);
+    const [showMessage, setShowMessage] = useState(false);
 
-    const mainPrice = useRef(null);
-    const extraPrice = useRef(null);
-    const sidePrice = useRef(null);
     const mainDeckCardNumber = useRef(0);
     const nameToEdit = useRef(null);
     const myCropper = useRef(null);
     const topPercent = useRef(0);
+    const errorTitle = useRef(null);
+    const errorMessage = useRef(null);
 
     useEffect(() => {
         const backAction = () => {
@@ -78,9 +78,6 @@ const DeckViewerScreen = ({navigation, route}) => {
     useEffect(() => {
         const loadDeckContents = async () => {
             if (deck && deck.content.length > 0) {
-                mainPrice.current = {cardmarket_price: 0, tcgplayer_price: 0, ebay_price: 0, amazon_price: 0, coolstuffinc_price: 0};
-                extraPrice.current = {cardmarket_price: 0, tcgplayer_price: 0, ebay_price: 0, amazon_price: 0, coolstuffinc_price: 0};
-                sidePrice.current = {cardmarket_price: 0, tcgplayer_price: 0, ebay_price: 0, amazon_price: 0, coolstuffinc_price: 0};
 
                 let mainAux = [];
                 let extraAux = [];
@@ -179,48 +176,6 @@ const DeckViewerScreen = ({navigation, route}) => {
 
                 images.sort((a, b) => a === deck.img ? -1 : b === deck.img ? 1 : 0);
 
-                for (let m of mainList) {
-                    mainPrice.current.cardmarket_price += Number(m.card.card_prices[0].cardmarket_price) * m.quantity;
-                    mainPrice.current.tcgplayer_price += Number(m.card.card_prices[0].tcgplayer_price) * m.quantity;
-                    mainPrice.current.ebay_price += Number(m.card.card_prices[0].ebay_price) * m.quantity;
-                    mainPrice.current.amazon_price += Number(m.card.card_prices[0].amazon_price) * m.quantity;
-                    mainPrice.current.coolstuffinc_price += Number(m.card.card_prices[0].coolstuffinc_price) * m.quantity;
-                }
-
-                mainPrice.current.cardmarket_price = formatPrice(mainPrice.current.cardmarket_price);
-                mainPrice.current.tcgplayer_price = formatPrice(mainPrice.current.tcgplayer_price);
-                mainPrice.current.ebay_price = formatPrice(mainPrice.current.ebay_price);
-                mainPrice.current.amazon_price = formatPrice(mainPrice.current.amazon_price);
-                mainPrice.current.coolstuffinc_price = formatPrice(mainPrice.current.coolstuffinc_price);
-
-                for (let m of extraList) {
-                    extraPrice.current.cardmarket_price += Number(m.card.card_prices[0].cardmarket_price) * m.quantity;
-                    extraPrice.current.tcgplayer_price += Number(m.card.card_prices[0].tcgplayer_price) * m.quantity;
-                    extraPrice.current.ebay_price += Number(m.card.card_prices[0].ebay_price) * m.quantity;
-                    extraPrice.current.amazon_price += Number(m.card.card_prices[0].amazon_price) * m.quantity;
-                    extraPrice.current.coolstuffinc_price += Number(m.card.card_prices[0].coolstuffinc_price) * m.quantity;
-                }
-
-                extraPrice.current.cardmarket_price = formatPrice(extraPrice.current.cardmarket_price);
-                extraPrice.current.tcgplayer_price = formatPrice(extraPrice.current.tcgplayer_price);
-                extraPrice.current.ebay_price = formatPrice(extraPrice.current.ebay_price);
-                extraPrice.current.amazon_price = formatPrice(extraPrice.current.amazon_price);
-                extraPrice.current.coolstuffinc_price = formatPrice(extraPrice.current.coolstuffinc_price);
-
-                for (let m of sideList) {
-                    sidePrice.current.cardmarket_price += Number(m.card.card_prices[0].cardmarket_price) * m.quantity;
-                    sidePrice.current.tcgplayer_price += Number(m.card.card_prices[0].tcgplayer_price) * m.quantity;
-                    sidePrice.current.ebay_price += Number(m.card.card_prices[0].ebay_price) * m.quantity;
-                    sidePrice.current.amazon_price += Number(m.card.card_prices[0].amazon_price) * m.quantity;
-                    sidePrice.current.coolstuffinc_price += Number(m.card.card_prices[0].coolstuffinc_price) * m.quantity;
-                }
-
-                sidePrice.current.cardmarket_price = formatPrice(sidePrice.current.cardmarket_price);
-                sidePrice.current.tcgplayer_price = formatPrice(sidePrice.current.tcgplayer_price);
-                sidePrice.current.ebay_price = formatPrice(sidePrice.current.ebay_price);
-                sidePrice.current.amazon_price = formatPrice(sidePrice.current.amazon_price);
-                sidePrice.current.coolstuffinc_price = formatPrice(sidePrice.current.coolstuffinc_price);
-
                 if (deck.img) {
                     setSelectedImage(deck.img);
                 }
@@ -237,6 +192,9 @@ const DeckViewerScreen = ({navigation, route}) => {
                     }, 1500);
                 }
             }
+            else {
+                setIsInfoLoading(false);
+            }
         };
 
         async function searchByCode(code) {
@@ -249,7 +207,9 @@ const DeckViewerScreen = ({navigation, route}) => {
                     return await fetchCard(code);
                 }
             } catch (e) {
-                    console.log('Error searching code', code, 'in database' );
+                errorTitle.current = 'Error';
+                errorMessage.current = 'Error while searching code ' + code + ' in database';
+                setShowMessage(true);
             }
         }
 
@@ -257,10 +217,6 @@ const DeckViewerScreen = ({navigation, route}) => {
             loadDeckContents();
         }
     }, [deck, navigation, wait]);
-
-    const formatPrice = (price) => {
-        return Math.round(price * 100) / 100;
-    };
 
     const showCards = () => {
         const mainDeck = [...fullList[0]];
