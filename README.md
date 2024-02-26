@@ -1,4 +1,4 @@
-![ygo-tools](https://github.com/jmmdev/ygo-tools/assets/100143610/e3e9f902-5051-41de-b04f-858ec72c308a)
+![ygo-tools](https://github.com/jmmdev/ygo-tools/assets/100143610/53152392-23f1-43ed-9d6d-758656e02f24)
 
 YGO Tools provides some utilities for all kinds of Yu-Gi-Oh! Trading Card Game enjoyers including looking up cards information, sharing and managing decks or keeping track of your collected cards. Next, we'll recap those utilities using some visual guidance
 
