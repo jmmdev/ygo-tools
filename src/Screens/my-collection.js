@@ -39,9 +39,6 @@ const MyCollectionScreen = ({navigation}) => {
                         const parsedValue = JSON.parse(value);
                         collection.current = parsedValue;
                         actualSets.current = [...collection.current];
-                        actualSets.current.sort((a, b) => {
-                            return a.set.set_name.localeCompare(b.set.set_name);
-                        });
 
                         if (lastFilter.current) {
                             actualSets.current = actualSets.current.filter(set => set.set.set_name.toLowerCase().includes(lastFilter.current)
@@ -169,6 +166,9 @@ const MyCollectionScreen = ({navigation}) => {
                             }
                         }
                         if (addedSets.current.length > 0) {
+                            collection.current.sort((a, b) => {
+                                return a.set.set_name.localeCompare(b.set.set_name);
+                            });
                             await AsyncStorage.setItem('collection', JSON.stringify(collection.current));
                             actualSets.current = [...collection.current];
                             pageCardList.current = collection.current.slice(0, resultsLength < actualSets.current.length ? resultsLength : actualSets.current.length);
