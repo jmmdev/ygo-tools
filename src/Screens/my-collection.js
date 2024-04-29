@@ -39,6 +39,7 @@ const MyCollectionScreen = ({navigation}) => {
                         const parsedValue = JSON.parse(value);
                         collection.current = parsedValue;
                         actualSets.current = [...collection.current];
+                        actualSets.current.sort((a, b) => {return a.set.set_name.localeCompare(b.set.set_name)});
 
                         if (lastFilter.current) {
                             actualSets.current = actualSets.current.filter(set => set.set.set_name.toLowerCase().includes(lastFilter.current)
