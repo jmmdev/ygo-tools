@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 const EditorCard = ({name, img, quantity, deckIndex, cardIndex, showCardRemovalMessage, updateDeckSize, canAddCopies}) => {
 
@@ -11,7 +12,7 @@ const EditorCard = ({name, img, quantity, deckIndex, cardIndex, showCardRemovalM
 
     return (
         <View key={deckIndex + cardIndex} style={styles.cardContainer}>
-            <Image style={styles.cardImage} source={{uri: img}}/>
+            <FastImage style={styles.cardImage} source={{uri: img}}/>
             <Text adjustsFontSizeToFit={true} style={styles.cardName}>{name}</Text>
             <View style={styles.cardCounter}>
                 {

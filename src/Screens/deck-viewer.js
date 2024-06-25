@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, DeviceEventEmitter, Dimensions, Image, ImageBackground, SafeAreaView, ScrollView,
+import { ActivityIndicator, BackHandler, DeviceEventEmitter, Dimensions, ImageBackground, SafeAreaView, ScrollView,
     StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '@rneui/base';
 import QRCode from 'react-native-qrcode-svg';
 import Draggable from 'react-native-draggable';
+import FastImage from 'react-native-fast-image';
 import DrawTest from '../Components/draw-test.js';
 
 const deviceWidth = Dimensions.get('window').width;
@@ -265,7 +266,7 @@ const DeckViewerScreen = ({navigation, route}) => {
         for (let i = 0; i < deckList.length; i++) {
             let card = deckList[i];
             for (let j = 1; j <= card.quantity; j++) {
-                cards.push(<Image key={i.toString() + j.toString()} style={styles.cardImage} source={{uri: card.card.card_images[0].image_url}}/>);
+                cards.push(<FastImage key={i.toString() + j.toString()} style={styles.cardImage} source={{uri: card.card.card_images[0].image_url}}/>);
             }
         }
 
@@ -706,7 +707,7 @@ const DeckViewerScreen = ({navigation, route}) => {
                                     return (
                                         <TouchableHighlight activeOpacity={1} underlayColor={'transparent'} onPress={() => setSelectedImage(img)} key={img + index}
                                         style={[styles.imgSquare, {backgroundColor: img === selectedImage ? '#88ddff' : 'transparent'}]}>
-                                            <Image style={styles.imgElement} source={{uri: img}} onError={e => {
+                                            <FastImage style={styles.imgElement} source={{uri: img}} onError={e => {
                                                 const arr = [...croppedImages];
                                                 arr.splice(index, 1);
                                                 setCroppedImages(arr);

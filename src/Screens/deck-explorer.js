@@ -7,6 +7,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { pickSingle } from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import FastImage from 'react-native-fast-image';
 import { RNCamera } from 'react-native-camera';
 import Header from '../Components/header';
 import { URL } from 'react-native-url-polyfill';
@@ -171,7 +172,7 @@ const DeckExplorerScreen = ({navigation, route}) => {
                                 navigation.navigate('DeckViewer', {deck: item, new: false});
                             }
                             }>
-                                <Image style={[item.img ? styles.cardImg : styles.placeholderImg, {top: item.imgZone ? -(item.imgZone).toString() + '%' : '-100%'}]}
+                                <FastImage style={[item.img ? styles.cardImg : styles.placeholderImg, {top: item.imgZone ? -(item.imgZone).toString() + '%' : '-100%'}]}
                                     source={item.img ? {uri: item.img} : placeholderImg} />
                                 <View style={styles.textContainer}>
                                     <Text adjustsFontSizeToFit={true} style={styles.deckTitle}>{item.name}</Text>
