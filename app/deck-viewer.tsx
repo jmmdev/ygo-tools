@@ -296,7 +296,7 @@ export default function DeckViewer() {
                     <Image style={styles.cardImage} source={{uri: card.card.card_images[0].image_url}}/>
                     <View style={styles.cardTextContainer}>
                         {card.quantity > 1 && <Text style={styles.cardText}>{card.quantity}x</Text>}
-                        <Text adjustsFontSizeToFit={true} numberOfLines={3} style={styles.cardText}>{card.card.name[0].en}</Text>
+                        <Text adjustsFontSizeToFit={true} numberOfLines={2} style={styles.cardText}>{card.card.name[0].en}</Text>
                     </View>
                 </View>
             )

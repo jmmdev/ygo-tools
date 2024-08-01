@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useFonts} from 'expo-font';
-
 import { Icon } from '@rneui/themed';
 import { Prompt } from './Prompt';
 
@@ -289,7 +288,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#00000060',
+        backgroundColor: '#0006',
         borderRadius: 200,
     },
     nameInput: {
@@ -375,69 +374,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-    },
-    codeInputForm: {
-        flex: 1,
-        height: '100%',
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    codeInput: {
-        width: '70%',
-        height: 48,
-        marginBottom: '5%',
-        backgroundColor: '#2a2a40',
-        fontSize: 24,
-        padding: 0,
-        paddingLeft: '4%',
-    },
-    codeInputButtons: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '70%',
-        height: 48,
-    },
-    inputButton: {
-        width: '48%',
-        height: '100%',
-        backgroundColor: '#13131d',
-        borderRadius: 3,
-        borderWidth: 1,
-        borderColor: '#ffffff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    inputButtonText: {
-        fontFamily: 'Roboto-700',
-        fontSize: 24,
-        color: '#ffffff',
-    },
-    buttonContainer: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-    },
-    button: {
-        padding: '5%',
-        display: 'flex',
-        width: '70%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 5,
-        borderColor: '#ffffff',
-        borderWidth: 1,
-        backgroundColor: '#13131d',
-    },
-    buttonText: {
-        color: '#ffffff',
-        fontFamily: 'Roboto-700',
-        fontSize: 24,
-        marginLeft: '5%',
     },
 });
