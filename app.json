@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "YGO Tools",
+    "slug": "ygo-tools",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/my-icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#0a090e",
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "android": {
+      "package": "com.anonymous.ygotools"
+    }
+  }
+}
