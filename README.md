@@ -1,50 +1,61 @@
-# Welcome to your Expo app 👋
+![ygo-tools](https://github.com/jmmdev/ygo-tools/assets/100143610/72a9751f-155e-44ec-b1d7-d21bd5b0c5a7)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+YGO Tools provides some utilities for all kinds of Yu-Gi-Oh! Trading Card Game enjoyers including looking up cards information, sharing and managing decks or keeping track of your collected cards. Next, we'll recap those utilities using some visual guidance
 
-## Get started
+First we have the splash and main screens featuring a simple menu: "Card Search", "Deck Explorer" and "My Collection"
 
-1. Install dependencies
+<br></br>
+![main](https://github.com/jmmdev/ygo-tools/assets/100143610/ea608bf3-ce9a-42e7-950b-d1cab9c1ba8d)
 
-   ```bash
-   npm install
-   ```
+<br></br>
+Card information can be obtained by providing either a card name or id / serial number
 
-2. Start the app
+<br></br>
+![search](https://github.com/jmmdev/ygo-tools/assets/100143610/f4c78a0a-55a0-442e-8e27-cb3b508c2c7d)
 
-   ```bash
-    npx expo start
-   ```
+<br></br>
+Once it's done we'll get information about the card art, name, type, effects and anything else related to that card. We'll also have the option to get a translation to a languange of our choice if available
 
-In the output, you'll find options to open the app in a
+<br></br>
+![translate](https://github.com/jmmdev/ygo-tools/assets/100143610/5630a798-deaf-40b5-bff5-d7354d7e1d85)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+<br></br>
+Moving into deck explorer tool we can see a(n empty) list. All decks we create will be displayed here along with three different options to add new ones:
+- Open a .ydk file (these can be exported from different games)
+- Scanning a QR code provided by the deck viewer screen
+- Create a deck from scratch
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+<br></br>
+![decks](https://github.com/jmmdev/ygo-tools/assets/100143610/30d598b1-594c-4ed3-a798-6a9095e87d96)
 
-## Get a fresh project
+<br></br>
+Tapping on any deck will lead to the deck viewer screen where comprised cards will be shown and some tools and options are provided:
+- Show a QR code to share your deck with another user
+- Test starting hands and draws to estimate the odds of getting specific cards
+- Show general edit options for your deck (edit name, display image in the deck list, cards contained or completely delete the deck)
 
-When you're ready, run:
+<br></br>
+![viewer](https://github.com/jmmdev/ygo-tools/assets/100143610/dd2ad8d5-e92d-4f86-a661-6dc86ed394fc)
 
-```bash
-npm run reset-project
-```
+<br></br>
+The next main feature is the deck editor. It provides the ability to modify card count as well as adding or removing cards (to / from main, extra or side deck). A very similar-looking to the card info search prompt
+will be shown if adding new cards is needed. A confirmation or error message will pop up in case the card adding operation is successful or not. 
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+<br></br>
+![editor](https://github.com/jmmdev/ygo-tools/assets/100143610/8067f1f6-bbb3-463d-a935-cae725aaa1db)
 
-## Learn more
+<br></br>
+Finally we have a simple collection tracking tool. Here we can access to all card sets released by Konami (main sets, Mega Packs, Gold Series, etc.), which can be searched by name or updated to include the most recent ones. Remember
+to check if your sets are updated when new ones release!
 
-To learn more about developing your project with Expo, look at the following resources:
+If we tap a set we'll be able to see all cards contained in that set along with their rarities and toggles, so if you acquired any of them check it and it will be saved for future reference
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+<br></br>
+![collection](https://github.com/jmmdev/ygo-tools/assets/100143610/b46011ea-f1f2-4ad0-bddc-620c515ee698)
 
-## Join the community
+<br></br>
+On top of this there's a card history screen where all relevant cards to the user will be registered for quick access (this includes manually searched cards and all cards contained in decks). These cards can also be sorted
+by different parameters or deleted at will
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+<br></br>
+![history](https://github.com/jmmdev/ygo-tools/assets/100143610/38642fc1-7e0e-4d4f-9c76-46dd9eb4dcfe)
