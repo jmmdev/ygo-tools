@@ -203,7 +203,7 @@ export function SearchCardName(
                                             {
                                                 type: type,
                                                 placement: 'bottom',
-                                                duration: 1000,
+                                                duration: 3000,
                                                 animationType: 'slide-in',
                                             }
                                         );

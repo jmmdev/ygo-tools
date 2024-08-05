@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
-import { pickSingle } from 'react-native-document-picker';
+import { pickSingle, isCancel } from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
@@ -79,26 +79,72 @@ export default function DeckExplorer() {
         }
     }, [isFocused]);
 
+    const ydkIsValid = (content: string) => {
+        const lines = content.split('\n');
+        
+        let mainTagCount = 0,
+            extraTagCount = 0,
+            sideTagCount = 0,
+            lastCardChecked = "",
+            copyCount = 0;
+
+        for (let line of lines) {
+            if (line.length > 0) {
+                switch (line){
+                    case "#main":
+                        mainTagCount++;
+                        break;
+                    case "#extra":
+                        extraTagCount++;
+                        break;
+                    case "!side":
+                        sideTagCount++;
+                        break;
+                    default:
+                        if (line.match(/^\d+$/)) {
+                            if (lastCardChecked === line) {
+                                copyCount++;
+                                if (copyCount > 3)
+                                    return false;
+                            } else {
+                                copyCount = 1;
+                                lastCardChecked = line;
+                            }
+                        }
+                    break;
+                }
+            }
+
+            return mainTagCount === 1 && (extraTagCount === 0 || extraTagCount === 1) && (sideTagCount === 0 || sideTagCount === 1);
+        }
+    }
+
     const loadYdk = () => {
         pickSingle({
             type: 'application/octet-stream',
-        }).then(async (result:any) => {
-            try {
+        }).then((result:any) => {
                 const path = result.uri;
-                const content = await RNFS.readFile(path, 'utf8');
+                RNFS.readFile(path, 'utf8')
+                .then(content => {
+                    if (!ydkIsValid(content)) {
+                        errorMessage.current = "Your file has an invalid deck format, please check it out and try again."
+                        setShowMessage(true);
+                        return;
+                    }
 
-                const deck = {name: result.name, content: content, img: null};
-
-                router.navigate({pathname: 'deck-viewer', params: {deck: JSON.stringify(deck), new: 1}});
-
-              } catch (e) {
+                    const deck = {name: result.name, content: content, img: null};
+                    router.navigate({pathname: 'deck-viewer', params: {deck: JSON.stringify(deck), new: 1}});
+                })
+                .catch(e => {
+                    errorMessage.current = 'There was an error while processing your file. Please try again';
+                    setShowMessage(true);
+                })
+        })
+        .catch(e => {
+            if (!isCancel(e)) {
                 errorMessage.current = 'There was an error while processing your file. Please try again';
                 setShowMessage(true);
-              }
-        })
-        .catch((e:any) => {
-            errorMessage.current = 'There was an error while processing your file. Please try again';
-            setShowMessage(true);
+            }
         });
     };
 
@@ -204,9 +250,9 @@ export default function DeckExplorer() {
                         flashMode={RNCamera.Constants.FlashMode.auto}/>
                     </View>
                     <View style={[styles.cameraBlackFrame, {padding: 32, alignItems: 'center'}]}>
-                    <TouchableOpacity onPress={() => setShowScanner(false)} style={{width: '20%', aspectRatio: 1, justifyContent: 'center', opacity: 0.75}}>
-                        <Icon color="#ffffff" name="close-o" size={deviceWidth * 0.12} type="evilicon"/>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowScanner(false)}>
+                            <Icon color="#ffffffc0" name="highlight-off" size={deviceWidth * 0.15} type="material"/>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 }
@@ -323,7 +369,7 @@ const styles = StyleSheet.create({
     cameraBlackFrame: {
         backgroundColor: '#000',
         width: '100%',
-        height: (deviceHeight - deviceWidth) / 2,
+        height: Math.floor((deviceHeight - deviceWidth) / 2),
     },
     cameraContainer: {
         width: '100%',

@@ -127,9 +127,10 @@ export default function CardList() {
         else {
             for (let c of cardList.current) {
                 try {
-                    await AsyncStorage.removeItem(c.id.toString());
+                    await AsyncStorage.removeItem(c.info.id.toString());
                 }
                 catch (e) {
+                    console.log(e);
                     errorMessage.current = "There was an error while trying to delete some entries from the database, please try again";
                     setshowMessage(true);
                 }
@@ -281,8 +282,8 @@ export default function CardList() {
                 {
                 showConfirm &&
                 <Prompt description={deleteAll.current 
-                    ? 'Delete al entries? (' + cardList.current.length +'total)'
-                    : 'Delete the selected entries? (' + idsToRemove.length + 'total)'} 
+                    ? 'Delete al entries? (' + cardList.current.length +' total)'
+                    : 'Delete the selected entries? (' + idsToRemove.length + ' total)'} 
                     type={'yesno'} noAction={() => setShowConfirm(false)} yesAction={() => deleteEntries()}/>
                 }
                 {showMessage && 

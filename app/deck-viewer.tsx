@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, DeviceEventEmitter, Dimensions, FlatList, Image, ImageBackground,
-    StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+    StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '@rneui/themed';
@@ -49,11 +49,13 @@ export default function DeckViewer() {
     const [showImgZones, setShowImgZones] = useState(false);
     const [draggableInfo, setDraggableInfo] = useState<any>(null);
     const [showMessage, setShowMessage] = useState(false);
+    const [showLargerCard, setShowLargerCard] = useState(false);
 
     const mainDeckCardNumber = useRef(0);
     const nameToEdit = useRef('');
     const topPercent = useRef(0);
     const errorMessage = useRef('');
+    const cardToEnlarge = useRef('');
     const initialRef: any = null;
     const nameInput = useRef(initialRef);
     const myCropper = useRef(initialRef);
@@ -245,63 +247,101 @@ export default function DeckViewer() {
         const extraDeck = [...fullList[1]];
         const sideDeck = [...fullList[2]];
 
-        let output:any[] = [];
+        let output: any[] = [];
 
         if (mainDeck.length > 0) {
-            const aux: any[] = [];
-            const total = getCards(mainDeck, aux, true);
+            const mainCards = getCards(mainDeck);
             output.push (
                 <View style={styles.deckTypeContainer}>
                     <Text style={styles.deckType}>Main deck</Text>
-                    {total > 0 && <Text style={styles.deckTotal}>{total} cards</Text>}
+                    <Text style={styles.deckTotal}>{mainCards.total} cards</Text>
                 </View>
             );
-            output = [...output, ...aux];
+            const cards = mainCards.cards;
+            let rowCards: any = [];
+            for (let i = 0; i < cards.length; i++) {
+                rowCards.push(cards[i]);
+                if ((i + 1) % 4 === 0 || i === cards.length - 1) {
+                    output.push (
+                        <View style={styles.cardRow}>
+                            {[...rowCards]}
+                        </View>
+                    )
+                    rowCards = [];
+                }
+            }
         }
 
         if (extraDeck.length > 0) {
-            const aux: any[] = [];
-            const total = getCards(extraDeck, aux, true);
-            output.push(
+            const extraCards = getCards(extraDeck);
+            output.push (
                 <View style={styles.deckTypeContainer}>
                     <Text style={styles.deckType}>Extra deck</Text>
-                    {total > 0 && <Text style={styles.deckTotal}>{total} cards</Text>}
+                    <Text style={styles.deckTotal}>{extraCards.total} cards</Text>
                 </View>
             );
-            getCards(extraDeck, output);
+            const cards = extraCards.cards;
+            let rowCards: any = [];
+            for (let i = 0; i < cards.length; i++) {
+                rowCards.push(cards[i]);
+                if ((i + 1) % 4 === 0 || i === cards.length - 1) {
+                    output.push (
+                        <View style={styles.cardRow}>
+                            {[...rowCards]}
+                        </View>
+                    )
+                    rowCards = [];
+                }
+            }
         }
 
         if (sideDeck.length > 0) {
-            const aux: any[] = [];
-            const total = getCards(sideDeck, aux, true);
-            output.push(
+            const mainCards = getCards(sideDeck);
+            output.push (
                 <View style={styles.deckTypeContainer}>
                     <Text style={styles.deckType}>Side deck</Text>
-                    {total > 0 && <Text style={styles.deckTotal}>{total} cards</Text>}
+                    <Text style={styles.deckTotal}>{mainCards.total} cards</Text>
                 </View>
             );
-            getCards(sideDeck, output);
+            const cards = mainCards.cards;
+            let rowCards: any = [];
+            for (let i = 0; i < cards.length; i++) {
+                rowCards.push(cards[i]);
+                if ((i + 1) % 4 === 0 || i === cards.length - 1) {
+                    output.push (
+                        <View style={styles.cardRow}>
+                            {[...rowCards]}
+                        </View>
+                    )
+                    rowCards = [];
+                }
+            }
         }
 
         return output;
     };
 
-    const getCards = (deckList: any[], target: any[], count?: boolean) => {
+    const getCards = (deckList: any[]) => {
         let total = 0;
-        for (let i = 0; i < deckList.length; i++) {
-            let card = deckList[i];
-            total += card.quantity;
-            target.push(
-                <View key={card.card.card_images[0].image_url + i} style={styles.cardContainer}>
-                    <Image style={styles.cardImage} source={{uri: card.card.card_images[0].image_url}}/>
-                    <View style={styles.cardTextContainer}>
-                        {card.quantity > 1 && <Text style={styles.cardText}>{card.quantity}x</Text>}
-                        <Text adjustsFontSizeToFit={true} numberOfLines={2} style={styles.cardText}>{card.card.name[0].en}</Text>
+        const cards: any[] = [];
+        for (let card of deckList) {
+            for (let i = 1; i <= card.quantity; i++) {
+                total++;
+                cards.push(
+                    <View key={card.card.card_images[0].image_url + i}>
+                        <Image style={styles.cardImage} source={{uri: card.card.card_images[0].image_url}}/>
+                        <TouchableOpacity style={styles.enlargeButton}
+                            onPress={() => {
+                                cardToEnlarge.current = card.card.card_images[0].image_url;
+                                setShowLargerCard(true);
+                            }}>
+                                <Icon style={{transform: [{scaleX: -1}]}} type="foundation" name="zoom-in" size={28} color={"#0008"} />
+                        </TouchableOpacity>
                     </View>
-                </View>
-            )
+                )
+            }
         }
-        return count ? total : 0;
+        return {cards: cards, total : total};
     };
 
     async function fetchCard(code:string) {
@@ -869,12 +909,21 @@ export default function DeckViewer() {
                         </View>
                     </View>
                     }
+                    {
+                    showLargerCard &&
+                    <View style={styles.largerCardContainer}>
+                        <Image style={styles.largeCardImage} source={{uri: cardToEnlarge.current}}/>
+                        <TouchableOpacity onPress={() => setShowLargerCard(false)}>
+                            <Icon color="#ffffffc0" name="highlight-off" size={deviceWidth * 0.15} type="material"/>
+                        </TouchableOpacity>
+                    </View>
+                    }
                     {fullList.length > 0 && (fullList[0].length > 0 || fullList[1].length > 0 || fullList[2].length > 0) &&
                     <FlatList
                         data={showCards()}
                         renderItem={({item}) => item}
                         onTouchStart={() => setShowOptions(false)}
-                        contentContainerStyle={{padding: '5%', gap: 12}}
+                        contentContainerStyle={{padding: '5%', gap: 4}}
                     />
                     }
                     {(!(fullList.length > 0) || !(fullList[0].length > 0 || fullList[1].length > 0 || fullList[2].length > 0)) &&
@@ -1041,6 +1090,22 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#ffdd00',
     },
+    largerCardContainer: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 600,
+        backgroundColor: '#000c',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 24,
+    },
+    largeCardImage: {
+        width: '75%',
+        aspectRatio: 0.686,
+    },
     deckSavedText: {
         fontSize: 32,
         color: '#fff',
@@ -1051,7 +1116,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
-        backgroundColor: '#000000c0',
+        backgroundColor: '#000c',
         zIndex: 500,
         alignItems: 'center',
         justifyContent: 'center',
@@ -1101,7 +1166,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         width: '100%',
-        color: '#ffffff',
+        color: '#fff',
         fontFamily: 'Roboto-700',
         fontSize: 36,
         marginTop: '5%',
@@ -1126,13 +1191,24 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginBottom: 2,
     },
-    cardContainer: {
+    cardRow: {
         flexDirection: 'row',
-        gap: 12,
+        gap: 4,
     },
     cardImage: {
-        height: deviceWidth * 0.9 * 0.16666 / 0.686,
+        height: Math.floor((deviceWidth * 0.9 - 12) * 0.25 / 0.686),
         aspectRatio: 0.686,
+    },
+    enlargeButton: {
+        width: '100%',
+        height: '100%',
+        paddingRight: Math.ceil(deviceWidth * 0.01),
+        position:'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 600,
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
     },
     cardTextContainer: {
         width: Math.ceil(deviceWidth - deviceWidth * 0.9 * 0.16666 - deviceWidth * 0.1 - 12),
@@ -1149,14 +1225,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 16,
-        backgroundColor: '#000000c0',
+        backgroundColor: '#000c',
         position: 'absolute',
         zIndex: 500,
     },
     imgsContainer: {
         width: '100%',
         height: '100%',
-        backgroundColor: '#000000c0',
+        backgroundColor: '#000c',
         position: 'absolute',
         top: 0,
         left: 0,

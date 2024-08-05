@@ -76,6 +76,9 @@ const styles = StyleSheet.create({
         color: '#fffc',
     },
     description: {
+        width: '85%',
+        textAlign: 'justify',
+        alignSelf: 'center',
         fontSize: 18,
         fontFamily: 'Roboto-600',
         color: '#fff',

@@ -1,8 +1,10 @@
 import { Stack } from "expo-router";
-import {StyleSheet, Text, View} from 'react-native';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
 
 import { ToastProvider } from 'react-native-toast-notifications';
 import { Icon } from '@rneui/themed';
+
+const deviceHeight = Dimensions.get('window').height;
 
 export default function RootLayout() {
 
@@ -47,7 +49,7 @@ const styles = StyleSheet.create({
   myToast: {
     flexDirection: 'row',
     width: '90%',
-    height: 60,
+    height: deviceHeight * 0.1,
     alignItems: 'center',
     borderRadius: 10,
     padding: 8,
