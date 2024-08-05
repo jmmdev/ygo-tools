@@ -1,5 +1,9 @@
-![logo](https://github.com/user-attachments/assets/ba50904b-779a-48f7-86ae-d5aa9aa48aeb)
+<br></br>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/37885a51-5a95-45aa-8d72-f7c97795fea8" />
+</p>
 
+<br></br>
 YGO Tools provides some utilities for all kinds of Yu-Gi-Oh! Trading Card Game enjoyers including looking up cards information, sharing and managing decks or keeping track of your collected cards. Next, we'll recap those utilities using some visual guidance
 
 First we have the splash and main screens featuring a simple menu: "Card Search", "Deck Explorer" and "My Collection"
