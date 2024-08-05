@@ -252,7 +252,7 @@ export default function DeckViewer() {
         if (mainDeck.length > 0) {
             const mainCards = getCards(mainDeck);
             output.push (
-                <View style={styles.deckTypeContainer}>
+                <View style={[styles.deckTypeContainer, {marginTop: 0}]}>
                     <Text style={styles.deckType}>Main deck</Text>
                     <Text style={styles.deckTotal}>{mainCards.total} cards</Text>
                 </View>
@@ -1179,6 +1179,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderBottomWidth: 1,
         borderColor: '#fff',
+        marginVertical: '5%',
     },
     deckType: {
         fontSize: 32,
