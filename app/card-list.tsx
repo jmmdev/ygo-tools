@@ -373,6 +373,7 @@ export default function CardList() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#232436',
     },
     wait: {
         width: '100%',
