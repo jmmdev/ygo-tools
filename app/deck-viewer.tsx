@@ -804,7 +804,7 @@ export default function DeckViewer() {
                     <View style={styles.qrContainer}>
                         <QRCode size={Math.min(qrSize, 400)} value={qrUrl} quietZone={16} />
                         <TouchableOpacity onPress={() => setShowQR(false)} activeOpacity={0.75}>
-                            <Icon color="#fffa" name="close-o" size={deviceWidth * 0.12} type="evilicon"/>
+                            <Icon color="#ffffffc0" name="highlight-off" size={deviceWidth * 0.15} type="material"/>
                         </TouchableOpacity>
                     </View>
                     }
