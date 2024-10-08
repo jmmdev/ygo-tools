@@ -24,7 +24,7 @@ Once it's done we'll get information about the card art, name, type, effects and
 ![translate](https://github.com/jmmdev/ygo-tools/assets/100143610/5630a798-deaf-40b5-bff5-d7354d7e1d85)
 
 <br></br>
-Moving into deck explorer tool we can see a(n empty) list. All decks we create will be displayed here along with three different options to add new ones:
+Moving into deck explorer tool we can see a list (which is empty at first). All decks we create will be displayed here along with three different options to add new ones:
 - Open a .ydk file (these can be exported from different games)
 - Scanning a QR code provided by the deck viewer screen
 - Create a deck from scratch
