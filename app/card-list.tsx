@@ -282,7 +282,7 @@ export default function CardList() {
                 {
                 showConfirm &&
                 <Prompt description={deleteAll.current 
-                    ? 'Delete al entries? (' + cardList.current.length +' total)'
+                    ? 'Delete all entries? (' + cardList.current.length +' total)'
                     : 'Delete the selected entries? (' + idsToRemove.length + ' total)'} 
                     type={'yesno'} noAction={() => setShowConfirm(false)} yesAction={() => deleteEntries()}/>
                 }
