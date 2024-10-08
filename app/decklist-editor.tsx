@@ -540,31 +540,16 @@ export default function DeckListEditor() {
                 <>
                     {
                     removeCardConfirmation &&
-                    <>
-                        <View style={styles.confirmContainer}>
-                            <View style={styles.confirmFrame}>
-                                <View style={styles.titleContainer}>
-                                    <Text style={styles.confirmTitle}>Warning</Text>
-                                    <Icon color="#ffffff" name="alert-circle-outline" size={22} type="material-community" style={{marginLeft: 4}}/>
-                                </View>
-                                <Text style={styles.confirmText}>Remove '{cardToRemove.current.name}' from {cardToRemove.current.deckIndex === 0
-                                ? 'main' : cardToRemove.current.deckIndex === 1 ? 'extra' : 'side'} deck?</Text>
-                                <View style={styles.buttonsContainer}>
-                                    <TouchableOpacity style={styles.confirmButton} onPress={() => {
-                                        setRemoveCardConfirmation(false);
-                                    }}>
-                                        <Text style={styles.buttonText}>No</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.confirmButton} onPress={() =>  {
-                                        setRemoveCardConfirmation(false);
-                                        removeCard();
-                                    }}>
-                                        <Text style={styles.buttonText}>Yes</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </>
+                    <Prompt
+                    description={`Remove ${cardToRemove.current.name} from ${cardToRemove.current.deckIndex === 0? 'main' : cardToRemove.current.deckIndex === 1 ? 'extra' : 'side'} deck?`}
+                    type={'yesno'}
+                    noAction={() => setRemoveCardConfirmation(false)}
+                    yesAction={() =>
+                        {
+                            setRemoveCardConfirmation(false);
+                            removeCard();
+                        }
+                    } />
                     }
                     {
                     savedConfirmationMessage &&
