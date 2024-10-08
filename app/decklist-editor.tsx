@@ -140,7 +140,7 @@ export default function DeckListEditor() {
                 elements.push(
                     <View key={'empty' + i}>
                         <View style={styles.deckTypeContainer}>
-                            <Text key={'d' + i} style={styles.deckType}>
+                            <Text style={styles.deckType}>
                                 {i === 0 ? 'Main' : i === 1 ? 'Extra' : 'Side'} Deck
                             </Text>
                         </View>

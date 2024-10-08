@@ -23,9 +23,7 @@ export function EditorCard({name, img, quantity, deckIndex, cardIndex, showCardR
             <Image style={styles.cardImage} source={{uri: img}}/>
             <Text adjustsFontSizeToFit={true} style={styles.cardName}>{name}</Text>
             <View style={styles.cardCounter}>
-                {
-                actualQuantity >= 1 &&
-                <TouchableOpacity style={styles.counterButton} onPress={() => {
+                <TouchableOpacity disabled={!(actualQuantity >= 1)} style={[styles.counterButton, {opacity: actualQuantity >= 1 ? 1 : 0.5}]} onPress={() => {
                     if (actualQuantity > 1) {
                         setActualQuantity(actualQuantity - 1);
                         updateDeckSize(deckIndex, cardIndex, -1);
@@ -36,17 +34,13 @@ export function EditorCard({name, img, quantity, deckIndex, cardIndex, showCardR
                 }}>
                     <Text adjustsFontSizeToFit={true} style={styles.counterButtonText}>-</Text>
                 </TouchableOpacity>
-                }
                 <Text style={styles.counter}>{actualQuantity}</Text>
-                {
-                actualQuantity < 3 && canAddCopies &&
-                <TouchableOpacity style={styles.counterButton} onPress={() => {
+                <TouchableOpacity disabled={!(actualQuantity < 3 && canAddCopies)} style={[styles.counterButton, {opacity: actualQuantity < 3 && canAddCopies ? 1 : 0.5}]} onPress={() => {
                     setActualQuantity(actualQuantity + 1);
                     updateDeckSize(deckIndex, cardIndex, 1);
                 }}>
                     <Text adjustsFontSizeToFit={true} style={styles.counterButtonText}>+</Text>
                 </TouchableOpacity>
-                }
             </View>
         </View>
     );
@@ -58,20 +52,18 @@ const styles = StyleSheet.create({
     cardContainer: {
         width: '100%',
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: '3%',
+        borderWidth: 1,
     },
     cardImage: {
-        width: '15%',
+        width: '17%',
         aspectRatio: 0.686,
-        marginRight: '5%',
     },
     cardName: {
         width: '55%',
-        fontFamily: 'Roboto',
         fontSize: 22,
         color: '#fff',
-        marginRight: '5%',
     },
     cardCounter: {
         width: '20%',
@@ -80,7 +72,6 @@ const styles = StyleSheet.create({
     },
     counter: {
         width: '33%',
-        fontFamily: 'Roboto',
         fontSize: 24,
         textAlign: 'center',
         color: '#fff',
