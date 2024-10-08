@@ -62,11 +62,13 @@ const styles = StyleSheet.create({
     },
     cardName: {
         width: '55%',
+        fontFamily: 'Roboto',
         fontSize: 22,
         color: '#fff',
     },
     cardCounter: {
         width: '20%',
+        fontFamily: 'Roboto',
         flexDirection: 'row',
         alignItems: 'center',
     },

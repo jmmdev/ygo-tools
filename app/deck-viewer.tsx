@@ -1017,6 +1017,7 @@ const styles = StyleSheet.create({
         padding: deviceWidth * 0.05,
     },
     optionText: {
+        fontFamily: 'Roboto',
         color: '#ffffffc0',
         fontSize: 20,
     },
