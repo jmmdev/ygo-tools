@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, BackHandler, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFonts } from 'expo-font';
 
-export default function DrawTest(props: any) {
+export function DrawTest(props: any) {
     const slideAnim = useRef(new Animated.Value(Dimensions.get('screen').height)).current;
     const bg = require('../assets/images/bg.png');
 

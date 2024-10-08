@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '@rneui/themed';
 import QRCode from 'react-native-qrcode-svg';
 import Draggable from 'react-native-draggable/Draggable';
-import DrawTest from '@/components/DrawTest';
+import { DrawTest } from '@/components/DrawTest';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { Prompt } from '@/components/Prompt';
@@ -987,7 +987,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     loading: {
-        height: '100%',
+        height: '92%',
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
