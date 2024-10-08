@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     },
     cardName: {
         width: '55%',
+        fontFamily: 'Roboto',
         fontSize: 22,
         color: '#fff',
         marginRight: '5%',
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
     },
     counter: {
         width: '33%',
+        fontFamily: 'Roboto',
         fontSize: 24,
         textAlign: 'center',
         color: '#fff',

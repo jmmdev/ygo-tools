@@ -64,29 +64,33 @@ export default function DeckListEditor() {
     }, [changed, enterName]);
 
     useEffect(() => {
-        const loadLanguage = async () => {
-            const value = await AsyncStorage.getItem('settings');
-            language.current = (value !== null ? JSON.parse(value).language : 'en');
-        };
-
-        loadLanguage();
-        setTimeout(() => {
-            setIsInfoLoading(false);
-        }, 1000);
-    }, []);
-
-    useEffect(() => {
         if (typeof params.name === "string") {
             nameToEdit.current = params.name;
         }
-        
-        sizes.current = [0, 0, 0];
 
         if (params.deckList && typeof params.deckList === "string" && !deckListClone.current) {
             deckList.current = JSON.parse(params.deckList);
             deckListClone.current = JSON.parse(JSON.stringify(deckList.current));
+            sizes.current = countCards(deckList.current);
+        } else {
+            sizes.current = [0, 0, 0];
         }
+        setIsInfoLoading(false);
     }, [params.deckList, params.name]);
+
+    function countCards(deckList: any[]) {
+        let countArray = [];
+        
+        for (let deck of deckList) {
+            let count = 0;
+            for (let card of deck) {
+                count += card.quantity;
+            }
+            countArray.push(count);
+        }
+
+        return countArray;
+    }
 
     const showCardRemovalMessage = (name:string, deckIndex:number, cardIndex:number) => {
         cardToRemove.current = {name: name, deckIndex: deckIndex, cardIndex: cardIndex};
@@ -111,10 +115,11 @@ export default function DeckListEditor() {
             for (let i = 0; i < deckListClone.current.length; i++) {
                 const deck = deckListClone.current[i];
                 elements.push(
-                    <View key={i} style={styles.deckContainer}>
-                        <Text key={'d' + i} style={[styles.deckType, {marginBottom: deck.length > 0 ? '5%' : 0}]}>
-                            {i === 0 ? 'Main Deck' : i === 1 ? 'Extra Deck' : 'Side Deck'}
+                    <View key={i} style={[styles.deckTypeContainer, {marginTop: i === 0 ? 0 : '5%'}]}>
+                        <Text key={'d' + i} style={styles.deckType}>
+                            {i === 0 ? 'Main' : i === 1 ? 'Extra' : 'Side'} Deck
                         </Text>
+                        <Text style={styles.deckTotal}>{sizes.current[i]} cards</Text>
                     </View>
                 );
                 getDeck(elements, i, deck)
@@ -134,7 +139,7 @@ export default function DeckListEditor() {
             for (let i = 0; i < 3; i++) {
                 elements.push(
                     <View key={'empty' + i}>
-                        <View style={styles.deckContainer}>
+                        <View style={styles.deckTypeContainer}>
                             <Text key={'d' + i} style={styles.deckType}>
                                 {i === 0 ? 'Main' : i === 1 ? 'Extra' : 'Side'} Deck
                             </Text>
@@ -582,7 +587,7 @@ export default function DeckListEditor() {
                         <FlatList
                             data={elementsToRender()} 
                             renderItem={({item}) => item}
-                            contentContainerStyle={styles.innerContainer}
+                            contentContainerStyle={{padding: '5%', gap: 4}}
                         />
                     </>
                     }
@@ -702,17 +707,25 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         marginTop: '5%',
     },
-    innerContainer: {
-        gap: deviceWidth * 0.03,
-    },
-    deckContainer: {
-        paddingTop: '3%',
-        paddingHorizontal: '3%',
+    deckTypeContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderColor: '#fff',
+        marginVertical: '5%',
     },
     deckType: {
         fontSize: 32,
         fontFamily: 'Roboto-700',
         color: '#fff',
+    },
+    deckTotal: {
+        fontSize: 20,
+        fontFamily: 'Roboto-600',
+        color: '#fff',
+        marginBottom: 2,
     },
     emptyMsg: {
         alignItems: 'center',
