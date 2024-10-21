@@ -271,7 +271,8 @@ export default function CardInfo() {
                 <Text style={styles.name}>{(data.info.name[0][language]).toUpperCase()}</Text>
                 <View style={styles.subContainer}>
                   <View style={styles.textContainer}>
-                    {data.info.level != null && <Text style={styles.subtext}>{'Level ' + data.info.level} </Text>}
+                    {data.info.level != null && data.info.level > 0 && <Text style={styles.subtext}>{data.info.frameType == 'xyz' ? 'Rank ' : 'Level ' + data.info.level} </Text>}
+                    {data.info.linkval != null && data.info.linkval > 0 && <Text style={styles.subtext}>{'LINK-' + data.info.linkval} </Text>}
                     {data.info.attribute != null && <Text style={attributeStyle && attributeStyle.attribute}>{data.info.attribute}</Text>}
                   </View>
                   <View style={styles.textContainer}>
