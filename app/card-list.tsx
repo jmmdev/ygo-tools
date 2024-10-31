@@ -210,7 +210,7 @@ export default function CardList() {
                         setShowConfirm(true);
                     }
                     : null}
-                thirdStyle={{opacity: showSortingOptions ? 0.5 : 1}}
+                thirdStyle={{backgroundColor: showSortingOptions ? '#000000c0' : 'transparent', opacity: showSortingOptions ? 0.5 : 1}}
                 firstIcon={cardList.current && cardList.current.length > 0 ? 'broom' : ""}
                 firstSize={deviceWidth * 0.07}
                 firstFunction={cardList.current && cardList.current.length > 0 && !showSortingOptions 
