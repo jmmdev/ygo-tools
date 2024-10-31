@@ -190,7 +190,7 @@ export default function SetCards() {
                 <Header
                 title={setName.current.length <= 20 ? setName.current : setName.current.substring(0, 20) + '...'}
                 goBackFunction={() => headerGoBackFunction()} firstIcon={'content-save'} firstSize={deviceWidth * 0.06}
-                firstFunction={() => saveChanges()} firstStyle={{opacity: changed > 0 ? 1 : 0.5, backgroundColor: changed > 0 ? '#0c6' : 'transparent'}} firstDisabled={!changed} />
+                firstFunction={() => saveChanges()} firstColor={changed ? '#fff' : '#fff8'} firstStyle={{backgroundColor: changed > 0 ? '#0c6' : 'transparent'}} firstDisabled={!changed} />
                 {
                 wait &&
                 <View style={styles.wait}>
@@ -223,9 +223,14 @@ export default function SetCards() {
                                 return (
                                     <View key={index} style={styles.cardContainer}>
                                         <Image style={styles.cardImage} source={card.img ? {uri: card.img} : require('../assets/images/no-card-found.png')} />
-                                        <Text style={styles.cardRarity}>
-                                            {`[${card.rarity_info.set_code}]\n${card.rarity_info.rarity}`}
-                                        </Text>
+                                        <View style={styles.cardRarity}>
+                                            <Text style={styles.rarityText}>
+                                                {`[${card.rarity_info.set_code}]`}
+                                            </Text>
+                                            <Text style={[styles.rarityText, {flex: 1}]}>
+                                                {card.rarity_info.rarity}
+                                            </Text>
+                                        </View>
                                         <View style={[styles.acquiredContainer, {backgroundColor: card.rarity_info.acquired ? '#0c6' : '#555'}]}>
                                             <Switch trackColor={{true: 'transparent', false: 'transparent'}} thumbColor={card.rarity_info.acquired ? '#fff' : '#999'}
                                             onValueChange={() => setCardAcquired(currentPage.current * resultsLength + index, !card.rarity_info.acquired)} value={card.rarity_info.acquired} />
@@ -354,28 +359,21 @@ const styles = StyleSheet.create({
         marginBottom: deviceWidth * 0.1,
         alignItems: 'center',
         gap: deviceWidth * 0.02,
-    },
-    alternateIcon: {
-        position: 'absolute',
-        zIndex: 600,
-        bottom: 0,
-        right: 0,
-        backgroundColor: '#0008',
+        justifyContent: 'space-between',
     },
     cardImage: {
         height: (deviceWidth * 0.9 - 16) * 0.333 / 0.686,
         aspectRatio: 0.686,
     },
-    textContainer: {
-        width: '100%',
-        height: deviceWidth * 0.2,
-        justifyContent: 'space-between',
-    },
     cardRarity: {
-        width: (deviceWidth * 0.9 * 0.333 - 8),
+        flex: 1,
+        gap: Math.min(4, deviceWidth * 0.0125),
+    },
+    rarityText: {
         color: '#fff',
-        fontSize: Math.max(16, deviceWidth * 0.02),
+        fontSize: Math.min(16, deviceWidth * 0.05),
         textAlign: 'center',
+        verticalAlign: 'middle',
         fontFamily: 'Roboto-700',
     },
     acquiredContainer: {
