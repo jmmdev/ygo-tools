@@ -1218,7 +1218,7 @@ const styles = StyleSheet.create({
         left: 0,
         zIndex: 600,
         justifyContent: 'flex-end',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         padding: '5%',
     },
     cardTextContainer: {
