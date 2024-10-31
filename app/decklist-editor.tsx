@@ -115,8 +115,8 @@ export default function DeckListEditor() {
             for (let i = 0; i < deckListClone.current.length; i++) {
                 const deck = deckListClone.current[i];
                 elements.push(
-                    <View key={i} style={[styles.deckTypeContainer, {marginTop: i === 0 ? 0 : '5%'}]}>
-                        <Text key={'d' + i} style={styles.deckType}>
+                    <View key={'d' + i} style={[styles.deckTypeContainer, {marginTop: i === 0 ? 0 : '5%'}]}>
+                        <Text style={styles.deckType}>
                             {i === 0 ? 'Main' : i === 1 ? 'Extra' : 'Side'} Deck
                         </Text>
                         <Text style={styles.deckTotal}>{sizes.current[i]} cards</Text>
@@ -124,15 +124,13 @@ export default function DeckListEditor() {
                 );
                 getDeck(elements, i, deck)
                 elements.push(
-                    <View key={'d.' + i} style={styles.addButtonContainer}>
-                        <TouchableHighlight disabled={!(sizes.current[i] < MAX_SIZES[i])} underlayColor={'#e0bb3f'}
-                        style={[styles.addButton, {opacity: sizes.current[i] < MAX_SIZES[i] ? 1 : 0.5}]} onPress={() => {
-                            setDeckIndexToEdit(i);
-                            setEnterName(true);
-                        }}>
-                            <Text style={styles.addText}>ADD CARDS TO {i === 0 ? 'MAIN' : i === 1 ? 'EXTRA' : 'SIDE'} DECK</Text>
-                        </TouchableHighlight>
-                    </View>
+                    <TouchableHighlight key={'d.' + i} disabled={!(sizes.current[i] < MAX_SIZES[i])} underlayColor={'#e0bb3f'}
+                    style={[styles.addButton, {opacity: sizes.current[i] < MAX_SIZES[i] ? 1 : 0.5}]} onPress={() => {
+                        setDeckIndexToEdit(i);
+                        setEnterName(true);
+                    }}>
+                        <Text style={styles.addText}>ADD CARDS TO {i === 0 ? 'MAIN' : i === 1 ? 'EXTRA' : 'SIDE'} DECK</Text>
+                    </TouchableHighlight>
                 );
             }
         } else {
@@ -148,14 +146,12 @@ export default function DeckListEditor() {
                             <Image source={require('../assets/images/no-card-found.png')} style={{height: deviceWidth * 0.9 * 0.25, aspectRatio: 0.8362}}/>
                             <Text style={styles.emptyText}>NO CARDS FOUND</Text>
                         </View>
-                        <View key={'md'} style={styles.addButtonContainer}>
-                            <TouchableHighlight underlayColor={'#e0bb3f'} style={styles.addButton} onPress={() => {
+                        <TouchableHighlight underlayColor={'#e0bb3f'} style={styles.addButton} onPress={() => {
                                 setDeckIndexToEdit(i);
                                 setEnterName(true);
                             }}>
                                 <Text style={styles.addText}>ADD CARDS TO {i === 0 ? 'MAIN' : i === 1 ? 'EXTRA' : 'SIDE'} DECK</Text>
                             </TouchableHighlight>
-                        </View>
                     </View>
                 );
             }
@@ -582,12 +578,12 @@ export default function DeckListEditor() {
                     !enterName &&
                     <>
                         <Header title={'Deck editor'} goBackFunction={() => headerGoBackFunction()}
-                        firstIcon={'content-save'} firstSize={deviceWidth * 0.08} firstFunction={() => saveChanges()} firstDisabled={changed <= 0}
+                        firstIcon={'content-save'} firstSize={deviceWidth * 0.06} firstFunction={() => saveChanges()} firstDisabled={changed <= 0}
                         firstStyle={{opacity: changed > 0 ? 1 : 0.5, backgroundColor: changed > 0 ? '#0c6' : 'transparent'}}/>
                         <FlatList
                             data={elementsToRender()} 
                             renderItem={({item}) => item}
-                            contentContainerStyle={{padding: '5%', gap: 4}}
+                            contentContainerStyle={{padding: '5%', gap: deviceWidth * 0.01}}
                         />
                     </>
                     }
@@ -717,7 +713,7 @@ const styles = StyleSheet.create({
         marginVertical: '5%',
     },
     deckType: {
-        fontSize: 32,
+        fontSize: 28,
         fontFamily: 'Roboto-700',
         color: '#fff',
     },
@@ -738,15 +734,13 @@ const styles = StyleSheet.create({
         width: '100%',
         color: '#ffffff',
         fontFamily: 'Roboto-700',
-        fontSize: 24,
+        fontSize: 20,
         marginTop: '2%',
         fontStyle: 'italic',
         textAlign: 'center',
     },
-    addButtonContainer: {
-        padding: '3%',
-    },
     addButton: {
+        marginTop: '3%',
         padding: '5%',
         alignItems: 'center',
         backgroundColor: '#f0df83',

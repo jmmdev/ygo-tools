@@ -202,9 +202,9 @@ export default function DeckExplorer() {
         <SafeAreaView style={styles.container}>
             <ImageBackground style={styles.image} source={bg} resizeMode={'cover'}>
                 <Header title={'Deck Explorer'}
-                firstIcon={'folder-open-outline'} firstSize={deviceWidth * 0.08} firstFunction={() => loadYdk()}
-                secondIcon={'scan-sharp'} secondSize={deviceWidth * 0.08} secondFunction={() => setShowScanner(true)}
-                thirdIcon={'plus'} thirdSize={deviceWidth * 0.09} thirdFunction={() => router.navigate({pathname: 'deck-viewer', params: {new: 1}})}/>
+                firstIcon={'folder-open-outline'} firstSize={deviceWidth * 0.06} firstFunction={() => loadYdk()}
+                secondIcon={'scan-sharp'} secondSize={deviceWidth * 0.06} secondFunction={() => setShowScanner(true)}
+                thirdIcon={'plus'} thirdSize={deviceWidth * 0.07} thirdFunction={() => router.navigate({pathname: 'deck-viewer', params: {new: 1}})}/>
                 {
                 (!decks || decks.length <= 0) &&
                 <View style={styles.emptyContainer}>
@@ -251,7 +251,7 @@ export default function DeckExplorer() {
                     </View>
                     <View style={[styles.cameraBlackFrame, {padding: 32, alignItems: 'center'}]}>
                         <TouchableOpacity onPress={() => setShowScanner(false)}>
-                            <Icon color="#ffffffc0" name="highlight-off" size={deviceWidth * 0.15} type="material"/>
+                            <Icon color="#ffffffc0" name="highlight-off" size={Math.min(deviceWidth * 0.15, 48)} type="material"/>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -379,12 +379,14 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     qrFrameContainer: {
-        width: '65%',
+        width: Math.min(deviceWidth * 0.65, 300),
+        maxWidth: 500,
         aspectRatio: 1,
         position: 'absolute',
         zIndex: 700,
-        top: '17.5%',
-        left: '17.5%',
+        top: '50%',
+        left: '50%',
+        transform: [{translateX: -(Math.min(deviceWidth * 0.65, 300)/2)}, {translateY: -(Math.min(deviceWidth * 0.65, 300)/2)}],
     },
     qrFrame: {
        height: '100%',

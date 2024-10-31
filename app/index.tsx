@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Image, View } from 'react-native';
 
-import {StackActions} from '@react-navigation/native';
 import { router } from 'expo-router';
 
 export default function Splash() {

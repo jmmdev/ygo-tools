@@ -116,7 +116,7 @@ export function DrawTest(props: any) {
         <Animated.View style={[styles.drawsContainer, {top: slideAnim}]}>
             <ImageBackground style={styles.image} source={bg} resizeMode={'cover'}>
                 <TouchableOpacity style={styles.close} onPress={() => props.setDrawTest(false)}>
-                    <Icon name="close" type="material-community" size={Dimensions.get('window').width * 0.08} color="#ffffffc0" />
+                    <Icon name="close" type="material-community" size={Dimensions.get('window').width * 0.07} color="#ffffffc0" />
                 </TouchableOpacity>
                 <View style={{height: '92%', padding: '5%'}}>
                         <View style={{flexDirection: 'row'}}>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     close: {
         position: 'absolute',
         top: 8,
-        right: '5%',
+        right: 8,
         zIndex: 700,
     },
     initialText: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     },
     footer: {
         width: '100%',
-        height: '8%',
+        height: '6%',
         flexDirection: 'row',
         backgroundColor: '#0a090e',
         position: 'absolute',

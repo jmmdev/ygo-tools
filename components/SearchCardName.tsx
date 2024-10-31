@@ -5,6 +5,8 @@ import {useFonts} from 'expo-font';
 import { Icon } from '@rneui/themed';
 import { Prompt } from './Prompt';
 
+const deviceWidth = Dimensions.get('window').width;
+
 export function SearchCardName(
     {showEnterNameFunction, cardSelectionFunction, cardElementIcon, cardIconTransform, cardSearchFilter, showToast}
     :{showEnterNameFunction?: any, cardSelectionFunction?: any, cardElementIcon: string, cardIconTransform?: any, cardSearchFilter?: any, showToast?: boolean}
@@ -12,7 +14,6 @@ export function SearchCardName(
 
     const toast = useToast();
     const pagesResultsLength = 15;
-    const deviceWidth = Dimensions.get('window').width;
 
     const initialRef: any = null;
     const myFlatList = useRef(initialRef);
@@ -146,7 +147,7 @@ export function SearchCardName(
                     showEnterNameFunction(false);
                     setText('');
                 }}>
-                    <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.08} type="material-community"/>
+                    <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.06} type="material-community"/>
                 </TouchableOpacity>
                 <View style={styles.inputStyle}>
                     <TextInput maxLength={30} style={[styles.nameInput, {fontStyle: text.length > 0 ? 'normal' : 'italic'}]} onFocus={() => setShowClear(text.length > 0)} ref={myTextInput} value={text} onChangeText={(value) => {
@@ -161,7 +162,7 @@ export function SearchCardName(
                         setText('');
                         myTextInput.current.focus();
                     }}>
-                        <Icon color="#ffffffc0" name="close-circle" size={Math.max(deviceWidth * 0.05, 26)} type="material-community"/>
+                        <Icon color="#ffffffc0" name="close-circle" size={Math.max(deviceWidth * 0.05, 22)} type="material-community"/>
                     </TouchableOpacity>}
                 </View>
             </View>
@@ -215,8 +216,8 @@ export function SearchCardName(
                                             <Text style={styles.cardId}>[{item.id}]</Text>
                                             <Text style={styles.cardName}>{item.name}</Text>
                                         </View>
-                                        <View style={{width: '10%', alignSelf: 'flex-start'}}>
-                                            <Icon style={cardIconTransform} color="#ffffff80" name={cardElementIcon} size={Math.max(24, deviceWidth * 0.05)} type="material-community"/>
+                                        <View style={{width: Math.min(48, deviceWidth * 0.05), height: '100%', justifyContent: 'flex-start'}}>
+                                            <Icon style={cardIconTransform} color="#ffffff80" name={cardElementIcon} size={Math.min(48, deviceWidth * 0.05)} type="material-community"/>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -252,7 +253,7 @@ export function SearchCardName(
 
 const styles = StyleSheet.create({
     backButton: {
-        width: '12.5%',
+        width: '10%',
         height: '100%',
         justifyContent: 'center',
     },
@@ -275,27 +276,27 @@ const styles = StyleSheet.create({
     },
     nameSearch: {
         width: '100%',
-        height: '8%',
+        height: '6%',
         backgroundColor: '#232436',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
     },
     inputStyle: {
-        width: '85%',
+        width: '87.5%',
         height: '75%',
-        paddingHorizontal: '5%',
+        paddingHorizontal: '3%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#0006',
+        backgroundColor: '#00000060',
         borderRadius: 200,
     },
     nameInput: {
         width: '90%',
         height: '80%',
         fontFamily: 'Roboto',
-        fontSize: 24,
+        fontSize: 20,
         color: '#ffffff',
         padding: 0,
     },
@@ -321,26 +322,26 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        gap: deviceWidth * 0.05,
     },
     cardImage: {
         width: '20%',
-        marginRight: '5%',
+        maxWidth: 100,
         aspectRatio: 0.686,
     },
     cardData: {
-        width: '60%',
+        width: deviceWidth * 0.8 - Math.min(48, deviceWidth * 0.05) - (Math.min(deviceWidth * 0.9 * 0.2, 100)),
         justifyContent: 'center',
-        marginRight: '5%',
     },
     cardId: {
         fontFamily: 'Roboto-600',
         fontSize: 20,
-        color: '#ffffff',
+        color: '#fff',
     },
     cardName: {
         fontFamily: 'Roboto-700',
-        fontSize: 26,
-        color: '#ffffff',
+        fontSize: 22,
+        color: '#fff',
     },
     pagesContainer: {
         width: '100%',
@@ -349,14 +350,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: '7.5%',
         marginBottom: '2.5%',
-        gap: Math.max(16, Dimensions.get('window').width * 0.03),
+        gap: Math.max(16, deviceWidth * 0.03),
     },
     firstAndLastPage: {
         justifyContent: 'center',
         alignItems: 'center',
     },
     pageFree: {
-        width: Dimensions.get('window').width * 0.09,
+        width: deviceWidth * 0.09,
         maxWidth: 56,
         aspectRatio: 1,
         borderRadius: 500,
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#13131d',
     },
     pageSelected: {
-        width: Dimensions.get('window').width * 0.09,
+        width: deviceWidth * 0.09,
         maxWidth: 56,
         aspectRatio: 1,
         borderRadius: 500,

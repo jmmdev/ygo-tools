@@ -222,10 +222,10 @@ export default function MyCollection() {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground style={styles.image} source={bg}>
-                <Header title={'Collection'} canSearch={true} inputSubmitFunction={filterSets}
+                <Header title={'My Collection'} canSearch={true} inputSubmitFunction={filterSets}
                 inputPlaceHolder={'Enter set name or code'} onHideSearchFunction={() => restoreSets()}
-                firstIcon={'refresh'} firstSize={deviceWidth * 0.09} firstFunction={() => updateCollection()}
-                thirdIcon={'table-search'} thirdSize={deviceWidth * 0.09} />
+                firstIcon={'refresh'} firstSize={deviceWidth * 0.065} firstFunction={() => updateCollection()}
+                thirdIcon={'table-search'} thirdSize={deviceWidth * 0.065} />
                 {
                 wait &&
                 <View style={styles.wait}>
@@ -240,30 +240,7 @@ export default function MyCollection() {
                 </View>
                 }
                 {showAddedSets &&
-                <View style={styles.messageContainer}>
-                    <View style={styles.messageFrame}>
-                        <View style={styles.upperContent}>
-                            <View style={styles.titleContainer}>
-                                <Text style={styles.title}>YGO Tools</Text>
-                                <Icon color="#ffffffc0" name="info-outline" size={22} type="material" style={{marginLeft: 4}}/>
-                            </View>
-                            {addedSets.current && addedSets.current.length > 0 &&
-                            <Text style={styles.messageText}>{'The following sets have been added\n'}</Text>
-                            }
-                            <ScrollView style={{maxHeight: deviceWidth * 0.4}} persistentScrollbar={true}>
-                                <Text style={styles.messageText}>{getAddedSets()}</Text>
-                            </ScrollView>
-                        </View>
-                        <View style={styles.buttonsContainer}>
-                            <TouchableOpacity style={styles.messageDismiss} onPress={() => {
-                                setShowAddedSets(false);
-                            }
-                            }>
-                                <Text style={styles.messageOkay}>OK</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
+                <Prompt type="ok" description={getAddedSets()} okAction={() => setShowAddedSets(false)} />
                 }
                 {showMessage &&
                     <Prompt description={errorMessage.current} type='ok'

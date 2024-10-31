@@ -15,7 +15,7 @@ export function MainScreenButton({pathname, params, source, buttonText}:{pathnam
             <TouchableOpacity style={styles.mainButton}
              onPress={() => router.navigate({pathname: pathname, params: params})}>
                 <ImageBackground style={{width: deviceWidth, height: imageHeight, justifyContent: 'center'}} source={source}>
-                    <Text adjustsFontSizeToFit={true} style={styles.mainButtonText}>{buttonText}</Text>
+                    <Text adjustsFontSizeToFit numberOfLines={2} style={styles.mainButtonText}>{buttonText}</Text>
                 </ImageBackground>
             </TouchableOpacity>
         </View>
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         maxHeight: '75%',
         fontFamily: 'Matrix-II-Bold',
         color: '#fff',
-        fontSize: deviceWidth * 0.09,
+        fontSize: Math.min(deviceWidth * 0.09, 40),
         padding: 0,
         letterSpacing: 4,
         marginHorizontal: '5%',

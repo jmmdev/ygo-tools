@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     cardName: {
         width: '55%',
         fontFamily: 'Roboto',
-        fontSize: 22,
+        fontSize: 20,
         color: '#fff',
     },
     cardCounter: {
@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     counter: {
         width: '33%',
@@ -80,15 +81,17 @@ const styles = StyleSheet.create({
     },
     counterButton: {
         width: '33%',
+        maxWidth: 32,
         aspectRatio: 1,
         justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: '#ffffffc0',
         borderRadius: 200,
     },
     counterButtonText: {
-        fontSize: 32,
         fontFamily: 'Roboto-800',
         textAlign: 'center',
         color: '#232436',
+        fontSize: 500,
     },
 });

@@ -10,6 +10,7 @@ import { useFonts } from 'expo-font';
 import { Prompt } from '@/components/Prompt';
 
 const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
 
 export default function CardList() {
 
@@ -20,7 +21,6 @@ export default function CardList() {
     });
 
     const [isInfoLoading, setIsInfoLoading] = useState(true);
-    const [showDeleteOptions, setShowDeleteOptions] = useState(false);
     const [showSortingOptions, setShowSortingOptions] = useState(false);
     const [showMessage, setshowMessage] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -48,7 +48,6 @@ export default function CardList() {
                 return true;
             } else if (idsToRemove.length > 0) {
                 setIdsToRemove([]);
-                setShowDeleteOptions(false);
                 return true;
             }
         };
@@ -200,12 +199,29 @@ export default function CardList() {
         <SafeAreaView style={styles.container}>
             <ImageBackground source={bgImg} resizeMode="cover" style={styles.image}>
                 <Header title={'Card history'}
-                firstIcon={cardList.current && cardList.current.length > 1 && !(idsToRemove.length > 0) ? 'sort'
-                    : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? 'dots-vertical' : ''}
-                firstSize={deviceWidth * 0.09}
-                firstFunction={cardList.current && cardList.current.length > 0 && !(idsToRemove.length > 0) ? () => setShowSortingOptions(!showSortingOptions)
-                : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? () => setShowDeleteOptions(!showDeleteOptions) : null}
-                firstStyle={{opacity: showSortingOptions ? 0.5 : 1, backgroundColor: showSortingOptions ? '#000000c0' : 'transparent'}}/>
+                thirdIcon={cardList.current && cardList.current.length > 1 && !(idsToRemove.length > 0) ? 'sort'
+                    : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0 ? 'playlist-remove' : ''}
+                thirdSize={deviceWidth * 0.075}
+                thirdFunction={cardList.current && cardList.current.length > 0 && !(idsToRemove.length > 0)
+                ? () => setShowSortingOptions(!showSortingOptions)
+                : cardList.current && cardList.current.length > 0 && idsToRemove.length > 0
+                    ? () => {
+                        deleteAll.current = false;
+                        setShowConfirm(true);
+                    }
+                    : null}
+                thirdStyle={{opacity: showSortingOptions ? 0.5 : 1}}
+                firstIcon={cardList.current && cardList.current.length > 0 ? 'broom' : ""}
+                firstSize={deviceWidth * 0.07}
+                firstFunction={cardList.current && cardList.current.length > 0 && !showSortingOptions 
+                    ? () => {
+                        deleteAll.current = true;
+                        setShowConfirm(true);
+                    }
+                    : null}
+                firstStyle={{display: showSortingOptions ? 'none' : 'flex'}}
+                firstColor={"#f66"}
+                />
                 {
                 wait &&
                 <View style={styles.wait}>
@@ -230,51 +246,40 @@ export default function CardList() {
                 </View>
                 }
                 {
-                showDeleteOptions && idsToRemove.length > 0 &&
-                <View style={[styles.optionsFrame, {top: '8%', borderTopWidth: 1}]}>
-                     <TouchableOpacity style={styles.optionContainer} onPress={() => {
-                        deleteAll.current = false;
-                        setShowDeleteOptions(false);
-                        setShowConfirm(true);
-                     }}>
-                        <Text style={styles.optionText}>Delete selected</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.optionContainer} onPress={() => {
-                        deleteAll.current = true;
-                        setShowDeleteOptions(false);
-                        setShowConfirm(true);
-                    }}>
-                        <Text style={[styles.optionText, {color: '#f55'}]}>Delete all cards</Text>
-                    </TouchableOpacity>
-                </View>
-                }
-                {
                 showSortingOptions &&
                 <View style={styles.optionsContainer}>
                     <View style={styles.optionsFrame}>
-                        <TouchableOpacity disabled={sorting === 0} style={[styles.optionContainer, {opacity: sorting === 0 ? 0.5 : 1}]} onPress={() => {
+                        <TouchableOpacity disabled={sorting === 0} style={[styles.optionContainer, {borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: sorting === 0 ? "#454658" : "#232436"}]} onPress={() => {
                             sortCards(0);
                         }}>
-                            <Text style={styles.optionText}>ID (asc)</Text>
-                            <Icon color="#ffffffc0" name="sort-numeric-ascending" size={deviceWidth * 0.07} type="material-community"/>
+                            <View style={styles.radioButton}>
+                                {sorting === 0 && <View style={styles.radioThumb} />}
+                            </View>
+                            <Text style={styles.optionText}>0-9</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity disabled={sorting === 1} style={[styles.optionContainer, {opacity: sorting === 1 ? 0.5 : 1}]} onPress={() => {
+                        <TouchableOpacity disabled={sorting === 1} style={[styles.optionContainer, {backgroundColor: sorting === 1 ? "#454658" : "#232436"}]} onPress={() => {
                             sortCards(1);
                         }}>
-                            <Text style={styles.optionText}>ID (desc)</Text>
-                            <Icon color="#ffffffc0" name="sort-numeric-descending" size={deviceWidth * 0.07} type="material-community"/>
+                            <View style={styles.radioButton}>
+                            {sorting === 1 && <View style={styles.radioThumb} />}
+                            </View>
+                            <Text style={styles.optionText}>9-0</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity disabled={sorting === 2} style={[styles.optionContainer, {opacity: sorting === 2 ? 0.5 : 1}]} onPress={() => {
+                        <TouchableOpacity disabled={sorting === 2} style={[styles.optionContainer, {backgroundColor: sorting === 2 ? "#454658" : "#232436"}]} onPress={() => {
                             sortCards(2);
                         }}>
-                            <Text style={styles.optionText}>Name (asc)</Text>
-                        <Icon color="#ffffffc0" name="sort-alphabetical-ascending" size={deviceWidth * 0.07} type="material-community"/>
+                            <View style={styles.radioButton}>
+                            {sorting === 2 && <View style={styles.radioThumb} />}
+                            </View>
+                            <Text style={styles.optionText}>A-Z</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity disabled={sorting === 3} style={[styles.optionContainer, {opacity: sorting === 3 ? 0.5 : 1}]} onPress={() => {
+                        <TouchableOpacity disabled={sorting === 3} style={[styles.optionContainer, {borderBottomLeftRadius: 16, borderBottomRightRadius: 16, backgroundColor: sorting === 3 ? "#454658" : "#232436"}]} onPress={() => {
                             sortCards(3);
                         }}>
-                            <Text style={styles.optionText}>Name (desc)</Text>
-                            <Icon color="#ffffffc0" name="sort-alphabetical-descending" size={deviceWidth * 0.07} type="material-community"/>
+                            <View style={styles.radioButton}>
+                            {sorting === 3 && <View style={styles.radioThumb} />}
+                            </View>
+                            <Text style={styles.optionText}>Z-A</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -282,8 +287,8 @@ export default function CardList() {
                 {
                 showConfirm &&
                 <Prompt description={deleteAll.current 
-                    ? 'Delete all entries? (' + cardList.current.length +' total)'
-                    : 'Delete the selected entries? (' + idsToRemove.length + ' total)'} 
+                    ? `Delete all entries? (${cardList.current.length} total)`
+                    : `Delete the selected entries? (${idsToRemove.length} total)`} 
                     type={'yesno'} noAction={() => setShowConfirm(false)} yesAction={() => deleteEntries()}/>
                 }
                 {showMessage && 
@@ -291,12 +296,29 @@ export default function CardList() {
                 }
                 {
                 cardList.current && cardList.current.length > 0 &&
-                <ScrollView ref={myFlatList} contentContainerStyle={styles.cardsContent} onTouchStart={() => setShowDeleteOptions(false)}>
-                    <View style={{gap: Dimensions.get('window').height * 0.025}}>
-                        {
-                            pageCardList.current.map((item: any) => {
-                                return (
-                                    <TouchableOpacity key={item.info.id} style={[styles.item, {backgroundColor: idsToRemove.includes(item.info.id, 0) ? '#ffffff30' : 'transparent'}]} onLongPress={() => {
+                <ScrollView ref={myFlatList} contentContainerStyle={styles.cardsContent}>
+                    {
+                        pageCardList.current.map((item: any, index: number) => {
+                            const nextItem: any = pageCardList.current[index + 1];
+                            return (
+                                <TouchableOpacity key={item.info.id}
+                                style={[styles.item, {
+                                    backgroundColor: idsToRemove.includes(item.info.id, 0) ? '#ddddff28' : 'transparent',
+                                    borderBottomWidth:
+                                        idsToRemove.includes(item.info.id, 0) && index < pageCardList.current.length - 1 && idsToRemove.includes(nextItem.info.id) ? 1 : 0}]} 
+                                
+                                onLongPress={() => {    
+                                    const indexUpdated = [...idsToRemove];
+                                    
+                                    if (idsToRemove.includes(item.info.id)) {
+                                        indexUpdated.splice(indexUpdated.indexOf(item.info.id), 1);
+                                    }
+                                    else {
+                                        indexUpdated.push(item.info.id);
+                                    }
+                                    setIdsToRemove(indexUpdated);
+                                } } onPress={() => {
+                                    if (idsToRemove.length > 0) {
                                         const indexUpdated = [...idsToRemove];
                                         if (idsToRemove.includes(item.info.id)) {
                                             indexUpdated.splice(indexUpdated.indexOf(item.info.id), 1);
@@ -304,40 +326,23 @@ export default function CardList() {
                                         else {
                                             indexUpdated.push(item.info.id);
                                         }
-                                        if (!(indexUpdated.length > 0)) {
-                                            setShowDeleteOptions(false);
-                                        }
                                         setIdsToRemove(indexUpdated);
-                                    } } onPress={() => {
-                                        if (idsToRemove.length > 0) {
-                                            const indexUpdated = [...idsToRemove];
-                                            if (idsToRemove.includes(item.info.id)) {
-                                                indexUpdated.splice(indexUpdated.indexOf(item.info.id), 1);
-                                            }
-                                            else {
-                                                indexUpdated.push(item.info.id);
-                                            }
-                                            if (!(indexUpdated.length > 0)) {
-                                                setShowDeleteOptions(false);
-                                            }
-                                            setIdsToRemove(indexUpdated);
-                                        }
-                                        else {
-                                            router.navigate({pathname: 'card-info', params: {id: item.info.id.toString()}});
-                                        }
-                                    }}>
-                                        <Image style={styles.cardImage} source={{uri: item.info.card_images[0].image_url}}/>
-                                        <View style={styles.cardData}>
-                                            <Text style={styles.cardId}>{item.info.id.toString().length < 8 ? '[0' + item.info.id + ']' : '[' + item.info.id + ']'}</Text>
-                                            <Text style={styles.cardName}>
-                                                {item.info.name[0].en ? item.info.name[0].en : item.info.name[0].en}
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                );
-                            })
-                        }
-                    </View>
+                                    }
+                                    else {
+                                        router.navigate({pathname: 'card-info', params: {id: item.info.id.toString()}});
+                                    }
+                                }}>
+                                    <Image style={styles.cardImage} source={{uri: item.info.card_images[0].image_url}}/>
+                                    <View style={styles.cardData}>
+                                        <Text style={styles.cardId}>{item.info.id.toString().length < 8 ? '[0' + item.info.id + ']' : '[' + item.info.id + ']'}</Text>
+                                        <Text style={styles.cardName}>
+                                            {item.info.name[0].en ? item.info.name[0].en : item.info.name[0].en}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })
+                    }
                     <View style={styles.pagesContainer}>
                         {!(idsToRemove.length > 0) &&
                         <>
@@ -450,34 +455,56 @@ const styles = StyleSheet.create({
     },
     optionsContainer: {
         width: '100%',
-        height: '92%',
+        height: '94%',
         position: 'absolute',
-        top: '8%',
+        top: '6%',
         right: 0,
         zIndex: 500,
         backgroundColor: '#000c',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     optionsFrame: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        zIndex: 600,
-        backgroundColor: '#121325',
-        borderBottomLeftRadius: 8,
+        width: '100%',
+        maxWidth: 300,
+        backgroundColor: '#454658',
+        flexDirection: 'column',
+        gap: 1,
+        borderRadius: 16,
     },
     optionContainer: {
-        flex: 1,
+        width: '100%',
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#232436',
-        gap: deviceWidth * 0.05,
-        padding: deviceWidth * 0.05,
+        gap: Math.min(deviceWidth * 0.05, 16),
+        paddingVertical: Math.min(deviceWidth * 0.08, 24),
+        paddingHorizontal: Math.min(deviceWidth * 0.1, 32),
+    },
+    radioButton: {
+        width: Math.min(deviceWidth * 0.08, 48),
+        aspectRatio: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#001',
+        borderRadius: 500,
+    },
+    radioThumb: {
+        width: '60%',
+        aspectRatio: 1,
+        backgroundColor: '#fff8',
+        borderRadius: 500,
     },
     optionText: {
         fontFamily: 'Roboto',
         color: '#ffffffc0',
-        fontSize: 20,
+        fontSize: 22,
+    },
+    cardsContent: {
+        minHeight: '94%',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
     },
     confirmContainer: {
         width: '100%',
@@ -526,38 +553,32 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#ffdd00',
     },
-    cardsContent: {
-        flexGrow: 1,
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '5%',
-    },
     item: {
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        gap: deviceWidth * 0.05,
+        padding: '5%',
     },
     cardImage: {
         width: '20%',
+        maxWidth: 100,
         aspectRatio: 0.686,
-        marginRight: '5%',
     },
     cardData: {
-        width: '75%',
+        width: deviceWidth * 0.85 - (Math.min(deviceWidth * 0.9 * 0.2, 100)),
         justifyContent: 'center',
     },
     cardId: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Roboto-600',
         fontSize: 20,
-        color: '#ffffff',
-        marginBottom: '2%',
+        color: '#fff',
     },
     cardName: {
         fontFamily: 'Roboto-700',
-        fontSize: 25,
-        marginBottom: '2%',
-        color: '#ffffff',
+        fontSize: 22,
+        color: '#fff',
     },
     pagesContainer: {
         width: '100%',

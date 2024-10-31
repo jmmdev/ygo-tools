@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { BackHandler, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Dimensions, PixelRatio, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { router } from 'expo-router';
 import { useFonts } from 'expo-font';
@@ -7,11 +7,11 @@ import { useFonts } from 'expo-font';
 export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, inputPlaceHolder, onHideSearchFunction,
                  firstIcon, firstSize, firstFunction, firstStyle, firstDisabled,
                  secondIcon, secondSize, secondFunction,
-                 thirdIcon, thirdSize, thirdFunction}
+                 thirdIcon, thirdSize, thirdFunction, thirdStyle, firstColor}
                  :{title: string, goBackFunction?: any, canSearch?: boolean, inputSubmitFunction?: any, inputPlaceHolder?: string, onHideSearchFunction?: any,
                     firstIcon?: string, firstSize?: number, firstFunction?: any, firstStyle?: any, firstDisabled?: boolean,
                     secondIcon?: string, secondSize?: number, secondFunction?: any,
-                    thirdIcon?: string, thirdSize?: number, thirdFunction?: any}){
+                    thirdIcon?: string, thirdSize?: number, thirdFunction?: any, thirdStyle?: any, firstColor?: string}){
 
     const [search, setSearch] = useState(false);
     const [text, setText] = useState('');
@@ -25,8 +25,7 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
     const myTextInput = useRef<TextInput>(initialRef);
 
     const deviceWidth = Dimensions.get('window').width;
-    const deviceHeight = Dimensions.get('window').height;
-
+    
     const [loaded, error] = useFonts({
         'Roboto-700': require('../assets/fonts/Roboto-700.ttf'),
     });
@@ -45,32 +44,28 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
 
     const inputStyles = StyleSheet.create({
         headerButtonContainer: {
-            width: deviceWidth * 0.125 * numButtons,
+            width: deviceWidth * 0.1 * numButtons,
             height: '100%',
             flexDirection: 'row',
             justifyContent: 'flex-end',
         },
         headerButton: {
-            width: deviceWidth * 0.125,
+            width: deviceWidth * 0.1,
             height: '100%',
             justifyContent: 'center',
         },
         headerText: {
-            width:
-                numButtons > 0
-                ? deviceWidth * 0.5 + ((3 - numButtons) * deviceWidth * 0.125)
-                : deviceWidth * 0.5 + ((3 - numButtons) * deviceWidth * 0.125) - deviceWidth * 0.05,
-            maxHeight: deviceHeight * 0.04,
+            width: deviceWidth - deviceWidth * 0.1 - numButtons * deviceWidth * 0.1,
             fontFamily: 'Roboto-700',
-            fontSize: 26,
-            color: '#ffffff',
+            fontSize: 24,
+            color: '#fff',
         },
         inputStyle: {
-            width: deviceWidth * 0.85,
-            maxWidth: deviceWidth * 0.875,
+            width: '87.5%',
             height: '75%',
-            maxHeight: '75%',
+            paddingHorizontal: '3%',
             flexDirection: 'row',
+            justifyContent: 'space-between',
             alignItems: 'center',
             backgroundColor: '#00000060',
             borderRadius: 200,
@@ -135,7 +130,7 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
                     goBackFunction ? goBackFunction() : router.back();
                 }
             }}>
-                <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.08} type="material-community"/>
+                <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.06} type="material-community"/>
             </TouchableOpacity>
             {!search &&
             <Text style={inputStyles.headerText}>{title}</Text>
@@ -161,7 +156,7 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
                     setText('');
                     myTextInput.current.focus();
                 }}>
-                    <Icon color="#fffc" name="close-circle" size={Math.max(deviceWidth * 0.05, 26)} type="material-community"/>
+                    <Icon color="#fffc" name="close-circle" size={Math.max(deviceWidth * 0.05, 22)} type="material-community"/>
                 </TouchableOpacity>}
             </View>
             }
@@ -170,7 +165,7 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
                 {firstIcon && !search &&
                 <TouchableOpacity style={[inputStyles.headerButton, firstStyle]} onPress={canSearch && targetButton.current === 0 ? () => setSearch(!search) : firstFunction}
                 disabled={firstDisabled}>
-                    <Icon color={firstStyle ? '#fff' : '#fffc'} name={firstIcon} size={firstSize} type="material-community"/>
+                    <Icon color={firstColor ? firstColor : "#fffc"} name={firstIcon} size={firstSize} type="material-community"/>
                 </TouchableOpacity>
                 }
                 {secondIcon && !search &&
@@ -179,8 +174,8 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
                 </TouchableOpacity>
                 }
                 {thirdIcon && !search &&
-                <TouchableOpacity style={inputStyles.headerButton} onPress={canSearch && targetButton.current === 2 ? () => setSearch(!search) : thirdFunction}>
-                    <Icon color="#fffc" name={thirdIcon} size={thirdSize} type="material-community"/>
+                <TouchableOpacity style={[inputStyles.headerButton, thirdStyle]} onPress={canSearch && targetButton.current === 2 ? () => setSearch(!search) : thirdFunction}>
+                    <Icon color={"#fffc"} name={thirdIcon} size={thirdSize} type="material-community"/>
                 </TouchableOpacity>
                 }
             </View>
@@ -191,29 +186,26 @@ export function Header ({title, goBackFunction, canSearch, inputSubmitFunction, 
 const styles = StyleSheet.create({
     header: {
         width: '100%',
-        height: '8%',
+        height: '6%',
         backgroundColor: '#232436',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
     },
     backButton: {
-        width: '12.5%',
+        width: '10%',
         height: '100%',
         justifyContent: 'center',
     },
     nameInput: {
-        width: '85%',
+        width: '90%',
         height: '80%',
         fontFamily: 'Roboto',
-        fontSize: 24,
+        fontSize: 20,
         color: '#ffffff',
-        padding: 0,
-        paddingLeft: '5%',
     },
     closeButton: {
         height: '100%',
-        marginHorizontal: '2.5%',
         alignItems: 'center',
         justifyContent: 'center',
     },

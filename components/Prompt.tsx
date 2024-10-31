@@ -1,23 +1,39 @@
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, PixelRatio, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { useFonts } from 'expo-font';
 
 const deviceWidth = Dimensions.get('window').width;
 
-export function Prompt({description, type, yesAction, noAction, okAction}:{description: string, type: string, yesAction?: any, noAction?: any, okAction?:any}) {
+export function Prompt({description, type, yesAction, noAction, okAction, buttons}:{description: string, type: string, yesAction?: any, noAction?: any, okAction?: any, buttons?: any[]}) {
     const [loaded, error] = useFonts({
         'Roboto-700': require('../assets/fonts/Roboto-700.ttf'),
         'Roboto-600': require('../assets/fonts/Roboto-600.ttf'),
         'Roboto': require('../assets/fonts/Roboto.ttf'),
     });
 
+    const GetButtons = () => {
+        const options: any[] = [];
+        if (buttons) {
+            for (let [index, be] of buttons.entries()) {
+                options.push(
+                    <TouchableOpacity key={index} style={[styles.button, be.buttonStyle]} onPress={be.action}>
+                        <Text style={[styles.buttonText, be.textStyle]}>{be.text}</Text>
+                    </TouchableOpacity>
+                )
+            }
+            return options;
+        }
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.frame}>
                 <View style={styles.upperContent}>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>YGO Tools</Text>
-                        <Icon color="#ffffffc0" name="warning" size={22} type="material" style={{marginLeft: 4}}/>
+                        <Text style={styles.title}>
+                            {'YGO Tools '}
+                            <Icon color="#fffc" name="info-outline" size={24} type="material" />
+                        </Text>
                     </View>
                     <Text style={styles.description}>{description}</Text>
                 </View>
@@ -38,6 +54,10 @@ export function Prompt({description, type, yesAction, noAction, okAction}:{descr
                 <TouchableOpacity style={[styles.button, styles.noButton]} onPress={okAction}>
                     <Text style={[styles.buttonText, styles.noText]}>OK</Text>
                 </TouchableOpacity>
+                }
+                {
+                type === "custom" &&
+                    <GetButtons />
                 }
                 </View>
             </View>
@@ -60,6 +80,7 @@ const styles = StyleSheet.create({
     frame: {
         width: '80%',
         backgroundColor: '#24242e',
+        borderRadius: deviceWidth * 0.03,
     },
     upperContent: {
         padding: '5%',
@@ -69,6 +90,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: '5%',
+        gap: 4,
     },
     title: {
         fontSize: 22,
@@ -76,8 +98,7 @@ const styles = StyleSheet.create({
         color: '#fffc',
     },
     description: {
-        width: '85%',
-        textAlign: 'justify',
+        width: '100%',
         alignSelf: 'center',
         fontSize: 18,
         fontFamily: 'Roboto-600',

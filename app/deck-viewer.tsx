@@ -335,7 +335,7 @@ export default function DeckViewer() {
                                 cardToEnlarge.current = card.card.card_images[0].image_url;
                                 setShowLargerCard(true);
                             }}>
-                                <Icon style={{transform: [{scaleX: -1}]}} type="foundation" name="zoom-in" size={28} color={"#0008"} />
+                                <Icon type="material" name="zoom-out-map" size={28} color={"#000"} />
                         </TouchableOpacity>
                     </View>
                 )
@@ -660,24 +660,25 @@ export default function DeckViewer() {
         <SafeAreaView style={styles.container}>
             <ImageBackground style={styles.image} source={bg} resizeMode={'cover'}>
                 <View style={styles.header}>
-                    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                        <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.08} type="material-community"/>
-                    </TouchableOpacity>
-                    <Text adjustsFontSizeToFit={true} style={styles.headerText}>{nameToEdit.current}</Text>
+                    <View style={styles.headerLeftContainer}>
+                        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                            <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.06} type="material-community"/>
+                        </TouchableOpacity>
+                        <Text adjustsFontSizeToFit={true} style={styles.headerText}>{nameToEdit.current}</Text>
+                    </View>
                     {
                     !isInfoLoading &&
                         <View style={styles.headerButtonContainer}>
                         {
                         (Number(params.new) === 1 && !saved && nameToEdit.current !== '') &&
                         <>
-                            <View style={styles.headerButton}/>
                             <TouchableOpacity style={styles.headerButton} 
                                 onPress={() => {
                                         setShowInputName(true);
                                     }
                                 }
                                 disabled={saved}>
-                                <Icon color="#fffc" name="content-save" size={deviceWidth * 0.08} type="material-community"/>
+                                <Icon color="#fff" name="content-save" size={deviceWidth * 0.06} type="material-community"/>
                             </TouchableOpacity>
                         </>
                         }
@@ -693,7 +694,7 @@ export default function DeckViewer() {
                                     setShowOptions(false);
                                     shareDeck();
                                 }}>
-                                <Icon color="#fffc" name="qr-code-outline" size={deviceWidth * 0.08} type="ionicon"/>
+                                <Icon color="#fffc" name="qr-code-outline" size={deviceWidth * 0.06} type="ionicon"/>
                             </TouchableOpacity>
                         }
                         {fullList[0].length > 0 &&
@@ -701,13 +702,13 @@ export default function DeckViewer() {
                                     setShowOptions(false);
                                     setDrawTest(true);
                                 }}>
-                                <Icon color="#fffc" name="cards" size={deviceWidth * 0.08} type="material-community"/>
+                                <Icon color="#fffc" name="cards" size={deviceWidth * 0.06} type="material-community"/>
                             </TouchableOpacity>
                         }
                         </>
                         }
                         <TouchableOpacity style={[styles.headerButton, {opacity: showOptions ? 0.5 : 1, backgroundColor: showOptions ? '#000000c0' : 'transparent'}]} onPress={() => setShowOptions(!showOptions)}>
-                            <Icon color="#fffc" name="menu" size={deviceWidth * 0.08} type="material-community"/>
+                            <Icon color="#fffc" name="menu" size={deviceWidth * 0.06} type="material-community"/>
                         </TouchableOpacity>
                         </>
                         }
@@ -752,8 +753,9 @@ export default function DeckViewer() {
                             setShowOptions(false);
                             setDeleteConfirmation(true);
                         }}>
-                            <Text style={[styles.optionText, {color: '#f55'}]}>Delete deck</Text>
-                            <Icon color="#f55" name="warning" size={20} type="material"/>
+                            <Text style={[styles.optionText, {color: '#f55'}]}>
+                                {'Delete deck '}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                     }
@@ -802,9 +804,9 @@ export default function DeckViewer() {
                     {
                     showQR && qrUrl &&
                     <View style={styles.qrContainer}>
-                        <QRCode size={Math.min(qrSize, 400)} value={qrUrl} quietZone={16} />
+                        <QRCode size={Math.min(qrSize, 250)} value={qrUrl} quietZone={16} />
                         <TouchableOpacity onPress={() => setShowQR(false)} activeOpacity={0.75}>
-                            <Icon color="#ffffffc0" name="highlight-off" size={deviceWidth * 0.15} type="material"/>
+                            <Icon color="#ffffffc0" name="close" size={Math.min(deviceWidth * 0.09, 48)} type="material-community"/>
                         </TouchableOpacity>
                     </View>
                     }
@@ -914,7 +916,7 @@ export default function DeckViewer() {
                     <View style={styles.largerCardContainer}>
                         <Image style={styles.largeCardImage} source={{uri: cardToEnlarge.current}}/>
                         <TouchableOpacity onPress={() => setShowLargerCard(false)}>
-                            <Icon color="#ffffffc0" name="highlight-off" size={deviceWidth * 0.15} type="material"/>
+                            <Icon color="#ffffffc0" name="highlight-off" size={Math.min(deviceWidth * 0.15, 48)} type="material"/>
                         </TouchableOpacity>
                     </View>
                     }
@@ -956,32 +958,37 @@ const styles = StyleSheet.create({
     },
     header: {
         width: '100%',
-        height: '8%',
+        height: '6%',
         backgroundColor: '#232436',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    headerLeftContainer: {
+        height: '100%',
         flexDirection: 'row',
         alignItems: 'center',
     },
     backButton: {
-        width: '12.5%',
+        width: deviceWidth * 0.1,
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
     headerText: {
-        width: '50%',
+        width: deviceWidth * 0.6,
         maxHeight: '75%',
         fontFamily: 'Roboto-700',
-        fontSize: 26,
+        fontSize: 24,
         color: '#fff',
     },
     headerButtonContainer: {
-        width: '37.5%',
         height: '100%',
         flexDirection: 'row',
         justifyContent: 'flex-end',
     },
     headerButton: {
-        width: '33.333%',
+        width: deviceWidth * 0.1,
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
@@ -1000,11 +1007,12 @@ const styles = StyleSheet.create({
     },
     optionsContainer: {
         position: 'absolute',
-        top: '8%',
+        top: '6%',
         right: 0,
         zIndex: 500,
-        backgroundColor: '#121325',
-        borderTopWidth: 1,
+        flexDirection: 'column',
+        gap: 1,
+        backgroundColor: '#454658',
         borderTopColor: '#010214',
         borderBottomLeftRadius: 8,
     },
@@ -1014,7 +1022,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#232436',
-        padding: deviceWidth * 0.05,
+        padding: deviceWidth * 0.03,
     },
     optionText: {
         fontFamily: 'Roboto',
@@ -1183,7 +1191,7 @@ const styles = StyleSheet.create({
         marginVertical: '5%',
     },
     deckType: {
-        fontSize: 32,
+        fontSize: 28,
         fontFamily: 'Roboto-700',
         color: '#fff',
     },
@@ -1210,7 +1218,8 @@ const styles = StyleSheet.create({
         left: 0,
         zIndex: 600,
         justifyContent: 'flex-end',
-        alignItems: 'flex-end',
+        alignItems: 'center',
+        padding: '5%',
     },
     cardTextContainer: {
         width: Math.ceil(deviceWidth - deviceWidth * 0.9 * 0.16666 - deviceWidth * 0.1 - 12),

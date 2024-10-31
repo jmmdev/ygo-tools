@@ -1,20 +1,20 @@
 import {router} from 'expo-router';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
-import { Dimensions, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ImageBackground, PixelRatio, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@rneui/themed';
 import { Header } from '@/components/Header';
 import { SearchCardName } from '@/components/SearchCardName';
 
+const deviceWidth = Dimensions.get('window').width;
+
 export default function CardSearch() {
     const [enterCode, setEnterCode] = useState(false);
     const [codeText, setCodeText] = useState('');
     const [wrongCodeFormat, setWrongCodeFormat] = useState(false);
     const [enterName, setEnterName] = useState(false);
-
-    const deviceWidth = Dimensions.get('window').width;
 
     const bgImg = require('../assets/images/bg.png');
 
@@ -75,14 +75,18 @@ export default function CardSearch() {
                 {!enterCode && !enterName &&
                 <>
                     <SafeAreaView style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={() => setEnterName(true)} style={styles.button} activeOpacity={0.5}>
-                            <Icon color="#ffffff" name="text-search" size={deviceWidth * 0.07} type="material-community" />
-                            <Text style={styles.buttonText}>Search by name</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setEnterCode(true)} style={styles.button} activeOpacity={0.5}>
-                            <Icon color="#ffffff" name="form-textbox" size={deviceWidth * 0.07} type="material-community" />
-                            <Text style={styles.buttonText}>Search by ID</Text>
-                        </TouchableOpacity>
+                        <View style={styles.buttonBackground}>
+                            <Text style={[styles.buttonText, {color: '#13131d'}]} adjustsFontSizeToFit numberOfLines={1}>Search by name</Text>
+                            <TouchableOpacity onPress={() => setEnterName(true)} style={styles.button} activeOpacity={0}>
+                                <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Search by name</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.buttonBackground}>
+                            <Text style={[styles.buttonText, {color: '#13131d'}]} adjustsFontSizeToFit numberOfLines={1}>Search by ID</Text>
+                            <TouchableOpacity onPress={() => setEnterCode(true)} style={styles.button} activeOpacity={0}>
+                                <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Search by ID</Text>
+                            </TouchableOpacity>
+                        </View>
                     </SafeAreaView>
                 </>}
             </ImageBackground>
@@ -109,12 +113,10 @@ const styles = StyleSheet.create({
     },
     codeInput: {
         width: '70%',
-        height: Math.max(48, Dimensions.get('window').height * 0.06),
         marginBottom: '5%',
         backgroundColor: '#2a2a40',
-        fontSize: 24,
-        padding: 0,
-        paddingLeft: '4%',
+        fontSize: 20,
+        padding: '2%',
         color: '#fff',
     },
     codeInputButtons: {
@@ -122,11 +124,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '70%',
-        height: Math.max(48, Dimensions.get('window').height * 0.06),
     },
     inputButton: {
         width: '48%',
-        height: '100%',
+        padding: '2%',
         backgroundColor: '#13131d',
         borderRadius: 3,
         borderWidth: Math.ceil(Dimensions.get('window').width / 400),
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     },
     inputButtonText: {
         fontFamily: 'Roboto-700',
-        fontSize: Math.min(24, Dimensions.get('window').width * 0.06),
+        fontSize: 20,
         color: '#ffffff',
     },
     buttonContainer: {
@@ -145,25 +146,33 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: Dimensions.get('window').height * 0.01,
+        gap: deviceWidth * 0.02,
+    },
+    buttonBackground: {
+        position: 'relative',
+        width: '70%',
+        maxWidth: 220,
+        borderRadius: 8,
+        backgroundColor: '#fff',
+        borderColor: '#fff',
+        borderWidth: 2,
     },
     button: {
-        padding: '5%',
-        display: 'flex',
-        width: '70%',
-        maxWidth: 500,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 5,
-        borderColor: '#ffffff',
-        borderWidth: Math.ceil(Dimensions.get('window').width / 400),
+        position: 'absolute',
+        top: -2,
+        left: -2,
+        width: Math.min(220, deviceWidth * 0.7),
+        borderRadius: 8,
+        borderColor: '#fff',
+        borderWidth: 2,
         backgroundColor: '#13131d',
     },
     buttonText: {
-        color: '#ffffff',
+        padding: '2.5%',
+        width: "100%",
+        color: '#fff',
+        fontSize:  24,
         fontFamily: 'Roboto-700',
-        fontSize: Math.min(24, Dimensions.get('window').width * 0.06),
-        marginLeft: '5%',
+        textAlign: 'center',
     },
 });

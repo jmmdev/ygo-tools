@@ -1,16 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRef, useEffect, useState} from 'react';
-import {ActivityIndicator, Alert, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Dimensions, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from '@rneui/themed';
 import { useIsFocused } from '@react-navigation/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Prompt } from '@/components/Prompt';
-
-type Card = {
-  info?: any;
-}
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -24,11 +20,11 @@ export default function CardInfo() {
     pt: require('../assets/images/pt.png'),
   };
   const LANGUAGES = [
-    {code: 'en', img: LANG_IMAGES.en},
-    {code: 'fr', img: LANG_IMAGES.fr},
-    {code: 'de', img: LANG_IMAGES.de},
-    {code: 'it', img: LANG_IMAGES.it},
-    {code: 'pt', img: LANG_IMAGES.pt},
+    {code: 'en', img: LANG_IMAGES.en, name: 'English'},
+    {code: 'fr', img: LANG_IMAGES.fr, name: 'Français'},
+    {code: 'de', img: LANG_IMAGES.de, name: 'Deutsch'},
+    {code: 'it', img: LANG_IMAGES.it, name: 'Italiano'},
+    {code: 'pt', img: LANG_IMAGES.pt, name: 'Português'},
   ];
 
   const params = useLocalSearchParams(); 
@@ -36,7 +32,7 @@ export default function CardInfo() {
   const [language, setLanguage] = useState('en');
   const [isInfoLoading, setIsInfoLoading] = useState(true);
   const [isTranslationLoading, setIsTranslationLoading] = useState(false);
-  const [data, setData] = useState({} as Card);
+  const [data, setData] = useState<any>({});
   const [showMessage, setShowMessage] = useState(false);
   const [showTranslationError, setShowTranslationError] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
@@ -193,22 +189,6 @@ export default function CardInfo() {
     setShowLanguages(!showLanguages);
   };
 
-  const displayLanguageList = () => {
-    return (
-      <View style={[styles.lgContainer, {opacity: showLanguages ? 1 : 0}]}>
-        {LANGUAGES.map((lg, index) => {
-          if (lg.code !== language) {
-            return (
-              <TouchableOpacity key={index} style={[styles.lgButton]} onPress={() => showLanguages ? selectLanguage(lg.code) : {}} activeOpacity={1} disabled={isTranslationLoading}>
-                <Image style={styles.lgImg} source={lg.img}/>
-              </TouchableOpacity>
-            );
-          }
-        })}
-      </View>
-    );
-  };
-
   const attributeStyle = data.info
   ? StyleSheet.create({
       attribute: {
@@ -227,7 +207,7 @@ export default function CardInfo() {
   : null;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ImageBackground source={bgImg}  resizeMode="cover" style={[styles.image, showMessage && {alignItems: 'center'} , (isInfoLoading || showMessage) && {justifyContent: 'center'}]}>
         {
         isInfoLoading &&
@@ -245,28 +225,22 @@ export default function CardInfo() {
         {
         !isInfoLoading && !showMessage && data.info &&
           <>
-          <TouchableOpacity activeOpacity={0.5} style={styles.backButton} onPress={() => router.back()}>
-            <Icon color="#fff" name="arrow-back" size={Math.max(40, deviceWidth * 0.07)} type="material"/>
-          </TouchableOpacity>
-          <View style={styles.innerContainer}>
-            <View style={styles.imgContainer}>
-              <Image style={styles.cardImg} source={{uri: data.info.card_images[0].image_url}} />
-              <View style={{width: Math.min(deviceWidth * 0.15, 64), justifyContent: 'center', alignItems: 'center'}}>
-                <TouchableOpacity style={styles.showLgButton} onPress={() => doShowLanguages()} activeOpacity={0.5}>
-                  <Image style={styles.lgImg} source={(LANG_IMAGES as any)[language]}/>
-                </TouchableOpacity>
-                {displayLanguageList()}
-              </View>
-            </View>
+          <View style={styles.top}>
+            <TouchableOpacity activeOpacity={0.5} style={styles.backButton} onPress={() => router.back()}>
+              <Icon color="#fffc" name="arrow-left" size={deviceWidth * 0.06} type="material-community"/>
+            </TouchableOpacity>
+            <Text style={styles.headerText}>Card details</Text>
           </View>
-          <ScrollView persistentScrollbar={true} contentContainerStyle={{paddingHorizontal: '5%', paddingBottom: '5%'}}>
-            {
-            isTranslationLoading &&
-              <ActivityIndicator style={{height: 250}} size={100} color={'#ffffffb0'}/>
-            }
-            {
-            !isTranslationLoading && data.info &&
-              <>
+          <View style={styles.innerContainer}>
+            <Image style={styles.cardImg} source={{uri: data.info.card_images[0].image_url}} />
+          
+            <ScrollView persistentScrollbar={true}>
+              {
+              isTranslationLoading &&
+                <ActivityIndicator style={{height: deviceHeight * 0.94 - deviceWidth * 0.15 - Math.min(deviceWidth * 0.9, 400) / 0.686}} size={100} color={'#ffffffb0'}/>
+              }
+              {
+              !isTranslationLoading && data.info &&
               <View>
                 <Text style={styles.name}>{(data.info.name[0][language]).toUpperCase()}</Text>
                 <View style={styles.subContainer}>
@@ -286,74 +260,151 @@ export default function CardInfo() {
                   <Text style={styles.description}>{data.info.desc[0][language]}</Text>
                 </View>
               </View>
-            </>
-            }
-          </ScrollView>
+              }
+            </ScrollView>
+          </View>
+          <View style={styles.mainLg}>
+            <TouchableOpacity style={styles.lgButton} onPress={() => doShowLanguages()} activeOpacity={0.5}>
+              <Image style={[styles.lgImg, {opacity: showLanguages ? 0.5 : 1}]} source={(LANG_IMAGES as any)[language]}/>
+            </TouchableOpacity>
+          </View>
+          {showLanguages &&
+          <View style={styles.optionsContainer}>
+            <View style={styles.optionsFrame}>
+            {LANGUAGES.map((lg, index) => {
+              return (
+                <TouchableOpacity style={[styles.optionContainer, {
+                  backgroundColor: language === lg.code ? "#454658" : "#232436",
+                  borderTopLeftRadius: index === 0 ? 16 : 0,
+                  borderTopRightRadius: index === 0 ? 16 : 0,
+                  borderBottomLeftRadius: index === LANGUAGES.length - 1 ? 16 : 0,
+                  borderBottomRightRadius: index === LANGUAGES.length - 1 ? 16 : 0
+                }]}
+                onPress={() => showLanguages ? selectLanguage(lg.code) : {}} disabled={isTranslationLoading}>
+                  <View style={styles.radioButton}>
+                      {language === lg.code && <View style={styles.radioThumb} />}
+                  </View>
+                  <View style={{height: deviceWidth * 0.1, gap: deviceWidth * 0.03, flexDirection: 'row', alignItems: 'center'}}>
+                      <View style={styles.lgButton}>
+                        <Image style={styles.lgImg} source={lg.img}/>
+                      </View>
+                      <Text style={styles.optionText}>{lg.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+            </View>
+          </View>
+          }
         </>
         }
       </ImageBackground>
-    </View>
+      </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#232436',
     minHeight: deviceHeight,
   },
+  top: {
+    width: '100%',
+    height: '6%',
+    backgroundColor: '#232436',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerText: {
+    fontFamily: 'Roboto-700',
+    fontSize: 24,
+    color: '#fff',
+},
   image: {
     height: '100%',
   },
   backButton: {
-    width: Math.max(40, deviceWidth * 0.07) * 1.2,
-    aspectRatio: 1,
+    width: deviceWidth * 0.1,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    zIndex: 100,
-    borderRadius: 200,
-    backgroundColor: '#12121b',
-    opacity: 0.75,
-    marginLeft: deviceWidth * 0.02,
-    marginTop: deviceWidth * 0.1,
   },
   innerContainer: {
+    width: '100%',
+    height: '94%',
+    gap: deviceWidth * 0.05,
     padding: '5%',
-    marginTop: '20%',
-  },
-  imgContainer: {
-    flexDirection: 'row',
   },
   cardImg: {
-    width: '80%',
+    width: '100%',
     maxWidth: 400,
     aspectRatio: 0.686,
     marginRight: '5%',
   },
-  showLgButton: {
-    width: '90%',
+  optionsContainer: {
+    width: '100%',
+    height: '94%',
+    position: 'absolute',
+    top: '6%',
+    right: 0,
+    zIndex: 500,
+    backgroundColor: '#000c',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  optionsFrame: {
+      backgroundColor: '#454658',
+      flexDirection: 'column',
+      gap: 1,
+      borderRadius: 16,
+  },
+  optionContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#232436',
+      gap: deviceWidth * 0.05,
+      paddingVertical: deviceWidth * 0.05,
+      paddingHorizontal: deviceWidth * 0.08,
+  },
+  radioButton: {
+      width: deviceWidth * 0.08,
+      aspectRatio: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#001',
+      borderRadius: 500,
+  },
+  radioThumb: {
+      width: '60%',
+      aspectRatio: 1,
+      backgroundColor: '#fff8',
+      borderRadius: 500,
+  },
+  lgButton: {
+    height: '100%',
     aspectRatio: 1,
-    marginVertical: '20%',
-    backgroundColor: '#fffb',
     borderRadius: 500,
-    borderColor: '#fff',
-    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   lgImg: {
     height: '100%',
     aspectRatio: 1,
     borderRadius: 500,
   },
-  lgContainer: {
-    width: '100%',
-    alignItems: 'center',
+  optionText: {
+      fontFamily: 'Roboto',
+      color: '#ffffffc0',
+      fontSize: 26,
   },
-  lgButton: {
-    width: '90%',
+  mainLg: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: deviceWidth * 0.015,
+    width: deviceHeight * 0.06,
     aspectRatio: 1,
-    marginVertical: '20%',
-    backgroundColor: '#fffb',
-    borderRadius: 500,
-    opacity: 0.75,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   name: {
     color: 'white',

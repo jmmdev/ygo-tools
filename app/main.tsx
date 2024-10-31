@@ -13,12 +13,13 @@ export default function Main() {
   return (
     <View style={styles.container}>
         <ImageBackground style={styles.image} source={bg} resizeMode='cover'>
-            <View style={styles.mainButtonsContainer}>
-                <MainScreenButton pathname="card-search" source={card} buttonText={'Card\nSearch'} />
-                <MainScreenButton pathname="deck-explorer" params={{deckWasInvalid: 0}} source={deck} buttonText={'Deck\nExplorer'} />
-                <MainScreenButton pathname="my-collection" source={collection} buttonText={'My\nCollection'} />
-            </View>
-            <View style={styles.historyButtonContainer}>
+            <View style={styles.mainContainer}>
+                <View style={{width: '35%', maxWidth: 200, aspectRatio: 1.307}} />
+                <View style={styles.mainButtonsContainer}>
+                    <MainScreenButton pathname="card-search" source={card} buttonText={'Card\nSearch'} />
+                    <MainScreenButton pathname="deck-explorer" params={{deckWasInvalid: 0}} source={deck} buttonText={'Deck\nExplorer'} />
+                    <MainScreenButton pathname="my-collection" source={collection} buttonText={'My\nCollection'} />
+                </View>
                 <TouchableOpacity onPress={() => router.navigate('/card-list')} style={styles.historyButton}>
                     <Image style={styles.historyImg} source={historyImg} />
                 </TouchableOpacity>
@@ -29,37 +30,30 @@ export default function Main() {
 }
 
 const deviceWidth = Dimensions.get('window').width;
-const imageHeight = Math.ceil(deviceWidth / 3.75);
-const deviceHeight = Dimensions.get('window').height;
-const mainButtonsContainerGap = Math.max(deviceHeight * 0.02, 16);
-const mainButtonsContainerHeight = 2 * mainButtonsContainerGap + imageHeight * 3;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         width: '100%',
         height: '100%',
     },
     image: {
         height: '100%',
-        justifyContent: 'flex-end',
+    },
+    mainContainer: {
+        width: '100%',
+        height: '100%',
+        paddingVertical: '5%',
+        justifyContent: 'space-between',
     },
     mainButtonsContainer: {
-        height: mainButtonsContainerHeight,
-        gap: mainButtonsContainerGap,
-    },
-    historyButtonContainer: {
-        width: '100%',
-        height: (deviceHeight - mainButtonsContainerHeight) / 2,
+        gap: deviceWidth * 0.03,
+        alignSelf: 'center',
     },
     historyButton: {
         width: '35%',
         maxWidth: 200,
-        aspectRatio: 1.307,
         flexDirection: 'row',
-        justifyContent: 'center',
         alignSelf: 'center',
-        marginVertical: deviceHeight * 0.075,
     },
     historyImg: {
         width: '100%',

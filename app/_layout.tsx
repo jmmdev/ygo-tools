@@ -4,7 +4,7 @@ import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import { ToastProvider } from 'react-native-toast-notifications';
 import { Icon } from '@rneui/themed';
 
-const deviceHeight = Dimensions.get('window').height;
+const deviceWidth = Dimensions.get('window').width;
 
 export default function RootLayout() {
 
@@ -13,7 +13,6 @@ export default function RootLayout() {
     renderType={{
       success: (toast) => (
         <View style={[styles.myToast, {backgroundColor: '#d4edda'}]}>
-          <Icon style={{marginRight: 8}} name="check-decagram" color="#2a5834" size={22} type="material-community" />
           <Text style={[styles.myToastText, {color: '#2a5834', fontWeight: 'bold'}]}>
             {toast.message}<Text style={[styles.myToastText, {fontWeight: 'normal'}]}> added</Text>
             </Text>
@@ -21,7 +20,6 @@ export default function RootLayout() {
       ),
       danger: (toast) => (
         <View style={[styles.myToast, {backgroundColor: '#f8d7da'}]}>
-          <Icon style={{marginRight: 8}} name="alert-decagram" color="#721c24" size={22} type="material-community" />
           <Text style={[styles.myToastText, {color: '#721c24', fontWeight: 'bold'}]}>
             {toast.message}<Text style={[styles.myToastText, {fontWeight: 'normal'}]}> could not be added</Text>
             </Text>
@@ -49,15 +47,13 @@ const styles = StyleSheet.create({
   myToast: {
     flexDirection: 'row',
     width: '90%',
-    height: deviceHeight * 0.1,
     alignItems: 'center',
     borderRadius: 10,
-    padding: 8,
-    marginBottom: 4,
+    padding: deviceWidth * 0.05,
   },
   myToastText: {
     fontFamily: 'Roboto',
-    fontSize: 20,
+    fontSize: 18,
     width: '90%',
   },
 });

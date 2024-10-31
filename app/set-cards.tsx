@@ -189,7 +189,7 @@ export default function SetCards() {
             <ImageBackground style={styles.image} source={bg}>
                 <Header
                 title={setName.current.length <= 20 ? setName.current : setName.current.substring(0, 20) + '...'}
-                goBackFunction={() => headerGoBackFunction()} firstIcon={'content-save'} firstSize={deviceWidth * 0.08}
+                goBackFunction={() => headerGoBackFunction()} firstIcon={'content-save'} firstSize={deviceWidth * 0.06}
                 firstFunction={() => saveChanges()} firstStyle={{opacity: changed > 0 ? 1 : 0.5, backgroundColor: changed > 0 ? '#0c6' : 'transparent'}} firstDisabled={!changed} />
                 {
                 wait &&
@@ -222,15 +222,14 @@ export default function SetCards() {
                             pageCardList.current.map((card:any, index:number) => {
                                 return (
                                     <View key={index} style={styles.cardContainer}>
-                                        <>
-                                            <Text style={styles.cardRarity}>[{card.rarity_info.set_code}]</Text>
-                                                <Image style={styles.cardImage} source={card.img ? {uri: card.img} : require('../assets/images/no-card-found.png')} />
-                                            <View style={[styles.acquiredContainer, {backgroundColor: card.rarity_info.acquired ? '#0c6' : '#555'}]}>
-                                                <Switch trackColor={{true: 'transparent', false: 'transparent'}} thumbColor={card.rarity_info.acquired ? '#fff' : '#999'}
-                                                onValueChange={() => setCardAcquired(currentPage.current * resultsLength + index, !card.rarity_info.acquired)} value={card.rarity_info.acquired} />
-                                            </View>
-                                            <Text style={styles.cardRarity}>{card.rarity_info.rarity}</Text>
-                                        </>
+                                        <Image style={styles.cardImage} source={card.img ? {uri: card.img} : require('../assets/images/no-card-found.png')} />
+                                        <Text style={styles.cardRarity}>
+                                            {`[${card.rarity_info.set_code}]\n${card.rarity_info.rarity}`}
+                                        </Text>
+                                        <View style={[styles.acquiredContainer, {backgroundColor: card.rarity_info.acquired ? '#0c6' : '#555'}]}>
+                                            <Switch trackColor={{true: 'transparent', false: 'transparent'}} thumbColor={card.rarity_info.acquired ? '#fff' : '#999'}
+                                            onValueChange={() => setCardAcquired(currentPage.current * resultsLength + index, !card.rarity_info.acquired)} value={card.rarity_info.acquired} />
+                                        </View>
                                     </View>
                                 );
                             })
