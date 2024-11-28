@@ -148,6 +148,16 @@ export default function DeckExplorer() {
         });
     };
 
+    function generateRandomName() {
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        const charactersLength = characters.length;
+        for (let i = 0; i < 8; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
     const loadQR = async (url:string) => {
         const myUrl = new URL(url);
 
@@ -180,11 +190,12 @@ export default function DeckExplorer() {
                     'Referer': 'https://rentry.co',
                     'Accept': 'application/json',
                     'Content-Type': 'text/plain',
+                    'rentry-auth': `${process.env.EXPO_PUBLIC_AUTH_CODE}`,
                 },
             });
             if (response.ok) {
                 const paste_content = await response.text();
-                const deck = {name: url.replace('https://rentry.co/', 'deck-'), content: paste_content, img: null};
+                const deck = {name: 'deck-' + generateRandomName(), content: paste_content, img: null};
                 router.navigate({pathname: 'deck-viewer', params: {deck: JSON.stringify(deck), new: 1}});
             } else {
                 errorMessage.current = 'There was an error while processing your request. Possible dead link in QR code.\n\nPlease check it out and try again';

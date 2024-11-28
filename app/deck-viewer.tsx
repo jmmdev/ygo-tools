@@ -378,7 +378,23 @@ export default function DeckViewer() {
     const shareDeck = async () => {
         setWait(true);
         if (deck.url) {
-            setQrUrl(deck.url);
+            const url = deck.url;
+            const actualUrl = url.includes('/raw') ? url : (url.charAt(url.length - 1) === '/' ? (url + 'raw') : (url + '/raw'));
+            const response = await fetch(actualUrl, {
+                headers: {
+                    'Referer': 'https://rentry.co',
+                    'Accept': 'application/json',
+                    'Content-Type': 'text/plain',
+                    'rentry-auth': `${process.env.EXPO_PUBLIC_AUTH_CODE}`,
+                },
+            });
+            if (response.ok) {
+                setQrUrl(deck.url);
+            }
+            else {
+                const url = await postNew(deck.content);
+                setQrUrl(url);
+            }
         } else {
             const url = await postNew(deck.content);
             setQrUrl(url);
