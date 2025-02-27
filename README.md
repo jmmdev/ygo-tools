@@ -1,6 +1,7 @@
 <br></br>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/37885a51-5a95-45aa-8d72-f7c97795fea8" />
+    <img alt="YGO Tools logo" src="https://github.com/user-attachments/assets/37885a51-5a95-45aa-8d72-f7c97795fea8#gh-dark-mode-only">
+    <img alt="YGO Tools logo" src="https://github.com/user-attachments/assets/c0836db1-e276-474a-9873-2e69c20c4262#gh-light-mode-only">
 </p>
 
 <br></br>
